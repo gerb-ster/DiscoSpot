@@ -1,0 +1,57 @@
+version: "3.2"
+services:
+  disco_spot_laravel:
+    container_name: disco_spot_laravel
+    build:
+      context: ./laravel
+      dockerfile: laravel.dockerfile
+    image: laravel
+    tty: true
+    environment:
+      SERVICE_NAME: laravel
+      SERVICE_TAGS: dev
+    working_dir: /var/www/html/
+    volumes:
+      - ./laravel:/var/www/html/
+      - ./supervisord/supervisord.conf:/etc/supervisord.conf
+    networks:
+      - app-network
+  disco_spot_webserver:
+    container_name: disco_spot_webserver
+    depends_on:
+      - disco_spot_laravel
+    build:
+      context: nginx
+      dockerfile: nginx.dockerfile
+    tty: true
+    ports:
+      - "12001:80"
+    networks:
+      - app-network
+  disco_spot_memcached:
+    container_name: disco_spot_memcached
+    image: "memcached:latest"
+    networks:
+      - app-network
+  disco_spot_beanstalkd:
+    container_name: disco_spot_beanstalkd
+    build:
+      context: beanstalkd
+      dockerfile: beanstalkd.dockerfile
+    networks:
+      - app-network
+  disco_spot_mariadb:
+    container_name: disco_spot__mariadb
+    image: "mariadb:latest"
+    ports:
+      - "12002:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "disco_spot"
+      MYSQL_USER: "disco_spot"
+      MYSQL_PASSWORD: "secret"
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge

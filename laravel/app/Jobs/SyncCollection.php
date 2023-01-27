@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Service\DiscogsApiClient;
+use App\Service\DiscogsApiException;
+use Exception;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use JetBrains\PhpStorm\NoReturn;
+
+class SyncCollection implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * @var DiscogsApiClient
+     */
+    private DiscogsApiClient $discogs;
+
+    /**
+     * Create a new job instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->discogs = new DiscogsApiClient();
+        $this->discogs->cacheEnabled = false;
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @return void
+     * @throws Exception|GuzzleException
+     */
+    #[NoReturn] public function handle(): void
+    {
+        $this->syncFolders();
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws DiscogsApiException
+     */
+    private function syncFolders()
+    {
+        $folders = $this->discogs->get('users/gerbster/collection/folders');
+
+        foreach ($folders['folders'] as $folder)
+        {
+
+        }
+    }
+}
