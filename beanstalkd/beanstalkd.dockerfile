@@ -1,10 +1,20 @@
-FROM debian:bullseye-slim
+FROM alpine:latest
 
-RUN apt-get update
+RUN apk update && apk upgrade --no-cache
 
 # beanstalkd
-RUN mkdir -p /var/lib/beanstalkd
-RUN apt-get install -y beanstalkd
+RUN addgroup -S beanstalkd && adduser -S -G beanstalkd beanstalkd
+RUN apk add --no-cache 'su-exec>=0.2'
+
+RUN apk --update add beanstalkd && \
+    rm -rf /tmp/* && \
+    rm -rf /var/cache/apk/*
+
+RUN mkdir /data && chown beanstalkd:beanstalkd /data
+
+VOLUME ["/data"]
 
 EXPOSE 11300
-CMD ["/usr/bin/beanstalkd","-l 0.0.0.0", "-p 11300", "-b /var/lib/beanstalkd"]
+
+ENTRYPOINT ["beanstalkd", "-p", "11300", "-u", "beanstalkd"]
+CMD ["-b", "/data"]

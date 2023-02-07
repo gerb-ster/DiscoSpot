@@ -11,5 +11,8 @@
     Hello {{ \Illuminate\Support\Facades\Auth::user()->name }},<br />
     You are now connected to Discogs & Spotify!
 </p>
+<p>
+    <a href="{{ route('app.playlist') }}">Click here to test the Spotify API</a>
+</p>
 </body>
 </html>

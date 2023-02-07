@@ -15,14 +15,13 @@ return new class extends Migration
     {
         Schema::create('playlists', function (Blueprint $table) {
             $table->id();
-            $table->integer('discogs_id')->unique();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('avatar');
-            $table->string('discogs_token', 256);
-            $table->string('discogs_secret', 256);
-            $table->string('spotify_token', 256);
-            $table->string('spotify_refresh_token', 256);
+            $table->string('uuid')->unique();
+            $table->foreignId('owner_id')->constrained('users');
+            $table->foreignId('playlist_type_id')->constrained('playlist_types');
+            $table->json('discogs_query_data');
+            $table->string('name', 256);
+            $table->string('spotify_identifier', 256);
+            $table->dateTime('last_sync');
             $table->timestamps();
         });
     }

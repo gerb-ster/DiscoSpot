@@ -13,9 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('playlist_types', function (Blueprint $table) {
+        Schema::create('spotify_cache', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->integer('discogs_master_release_id');
+            $table->string('spotify_uri');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('playlist_types');
+        Schema::dropIfExists('spotify_cache');
     }
 };
