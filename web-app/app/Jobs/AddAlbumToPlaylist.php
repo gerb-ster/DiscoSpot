@@ -13,7 +13,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use JetBrains\PhpStorm\NoReturn;
 
-class RetrieveDiscogsData implements ShouldQueue
+class AddAlbumToPlaylist implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
