@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscogsAuthController;
 use App\Http\Controllers\CollectionController;
@@ -24,7 +25,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 Route::get('/setup/discogs', [DiscogsAuthController::class, 'setup'])
     ->name('app.setup.discogs');
@@ -43,6 +44,11 @@ Route::group(['middleware' => ['auth']], function () {
     })->name('auth.spotify.connect');
     Route::get('/auth/spotify/callback', [SpotifyAuthController::class, 'callback'])
         ->name('auth.spotify.callback');
+
+    Route::get('/account/settings', [AccountController::class, 'settings'])
+        ->name('account.settings');
+    Route::get('/account/sign-out', [AccountController::class, 'signOut'])
+        ->name('account.sign-out');
 
     Route::get('/app/dashboard', [DashboardController::class, 'index'])
         ->name('app.dashboard');

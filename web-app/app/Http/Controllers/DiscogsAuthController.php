@@ -59,6 +59,10 @@ class DiscogsAuthController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('app.setup.spotify'));
+        if(is_null($user->spotify_token) && is_null($user->spotify_refresh_token)) {
+            return redirect(route('app.setup.spotify'));
+        }
+
+        return redirect(route('app.dashboard'));
     }
 }

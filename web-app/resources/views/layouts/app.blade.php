@@ -12,9 +12,8 @@
     </head>
     <body>
         <x-navigation class="menu-background flex-shrink-0 w-56 p-8 hidden md:block overflow-y-auto"/>
-        <div class="container mx-auto">
-            @yield('content')
-        </div>
+
+        @yield('content')
 
         @livewireScripts
     </body>
