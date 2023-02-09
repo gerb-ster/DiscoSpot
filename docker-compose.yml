@@ -7,8 +7,6 @@ services:
       dockerfile: laravel.dockerfile
     image: laravel
     tty: true
-    ports:
-      - "12002:12002"
     environment:
       SERVICE_NAME: laravel
       SERVICE_TAGS: dev
@@ -52,6 +50,17 @@ services:
       MYSQL_DATABASE: "disco_spot"
       MYSQL_USER: "disco_spot"
       MYSQL_PASSWORD: "secret"
+    networks:
+      - app-network
+  disco_spot_npm:
+    container_name: disco_spot_npm
+    image: node:current-alpine
+    volumes:
+      - ./web-app:/var/www/html
+    entrypoint: [ "npm", "run", "dev" ]
+    working_dir: /var/www/html
+    ports:
+      - "12002:12002"
     networks:
       - app-network
 networks:

@@ -25,6 +25,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class PlaylistType extends Model
 {
+    const BASED_ON_FOLDER = 1;
+    const BASED_ON_LIST = 2;
+    const BASED_ON_FILTER = 3;
+
 	protected $table = 'playlist_types';
 
 	protected $fillable = [
