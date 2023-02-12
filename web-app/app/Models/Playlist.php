@@ -9,6 +9,8 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 /**
  * Class Playlist
@@ -17,14 +19,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $uuid
  * @property int $owner_id
  * @property int $playlist_type_id
- * @property string $discogs_query_data
+ * @property array $discogs_query_data
  * @property string $name
  * @property string $spotify_identifier
  * @property Carbon $last_sync
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  *
- * @property User $user
+ * @property User $owner
  * @property PlaylistType $playlistType
  *
  * @package App\Models
@@ -35,7 +37,8 @@ class Playlist extends Model
 
 	protected $casts = [
 		'owner_id' => 'int',
-		'playlist_type_id' => 'int'
+		'playlist_type_id' => 'int',
+        'discogs_query_data' => 'array'
 	];
 
 	protected $dates = [
@@ -53,9 +56,25 @@ class Playlist extends Model
 	];
 
     /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // before creating, create a unique number
+        static::creating(function (Playlist $model) {
+            $model->owner_id = Auth::user()->id;
+            $model->uuid = Str::uuid();
+        });
+    }
+
+    /**
      * @return BelongsTo
      */
-	public function user(): BelongsTo
+	public function owner(): BelongsTo
     {
 		return $this->belongsTo(User::class, 'owner_id');
 	}

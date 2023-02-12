@@ -10,12 +10,16 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Str;
 
 /**
  * Class User
  *
  * @property int $id
+ * @property string $uuid
+ * @property int $account_type_id
  * @property int $discogs_id
+ * @property string $discogs_username
  * @property string $name
  * @property string $email
  * @property string $avatar
@@ -46,7 +50,10 @@ class User extends Authenticatable
 	];
 
 	protected $fillable = [
+        'account_type_id',
+        'uuid',
 		'discogs_id',
+        'discogs_username',
 		'name',
 		'email',
 		'avatar',
@@ -55,6 +62,22 @@ class User extends Authenticatable
 		'spotify_token',
 		'spotify_refresh_token'
 	];
+
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // before creating, create a unique number
+        static::creating(function (User $model) {
+            $model->uuid = Str::uuid();
+        });
+    }
 
     /**
      * @return HasMany

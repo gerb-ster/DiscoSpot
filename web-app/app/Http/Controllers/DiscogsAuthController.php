@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccountType;
 use App\Models\User;
 use App\Service\DiscogsApiClient;
 use App\Service\Storage\CacheStorage;
@@ -50,11 +51,13 @@ class DiscogsAuthController extends Controller
         $user = User::updateOrCreate([
             'discogs_id' => $discogsUser->getId(),
         ], [
-            'name' => $discogsUser->getNickname(),
+            'discogs_username' => $discogsProfile['username'],
+            'name' => $discogsProfile['name'],
             'email' => $discogsProfile['email'],
             'avatar' => $discogsProfile['avatar_url'],
             'discogs_token' => $discogsUser->token,
-            'discogs_secret' => $discogsUser->tokenSecret
+            'discogs_secret' => $discogsUser->tokenSecret,
+            'account_type_id' => AccountType::FULL
         ]);
 
         Auth::login($user);

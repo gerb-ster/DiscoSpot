@@ -4,16 +4,16 @@ services:
     container_name: disco_spot_laravel
     build:
       context: ./web-app
-      dockerfile: laravel.dockerfile
+      dockerfile: docker/laravel.dockerfile
     image: laravel
     tty: true
     environment:
+      TZ: Europe/Amsterdam
       SERVICE_NAME: laravel
       SERVICE_TAGS: dev
     working_dir: /var/www/html/
     volumes:
       - ./web-app:/var/www/html/
-      - ./supervisord/supervisord.conf:/etc/supervisord.conf
     networks:
       - app-network
   disco_spot_webserver:
@@ -61,6 +61,21 @@ services:
     working_dir: /var/www/html
     ports:
       - "12002:12002"
+    networks:
+      - app-network
+  disco_spot_mongodb:
+    container_name: disco_spot_mongodb
+    image: mongo:latest
+    volumes:
+      - ./mongodb/mongodb_vols/db:/data/db
+      - ./mongodb/mongodb_vols/config:/data/configdb
+    environment:
+      # provide your credentials here
+      - TZ=Europe/Amsterdam
+      - MONGO_INITDB_ROOT_USERNAME=disco_spot
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    ports:
+      - "12004:27017"
     networks:
       - app-network
 networks:

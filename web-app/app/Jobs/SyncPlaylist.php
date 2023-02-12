@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Models\Playlist;
+use App\Models\Synchronization;
 use App\Service\DiscogsApiClient;
 use App\Service\DiscogsApiException;
 use Exception;
@@ -18,19 +20,24 @@ class SyncPlaylist implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var DiscogsApiClient
+     * @var Playlist
      */
-    private DiscogsApiClient $discogs;
+    private Playlist $playlist;
+
+    /**
+     * @var Synchronization
+     */
+    private Synchronization $synchronization;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Playlist $playlist, Synchronization $synchronization)
     {
-        $this->discogs = new DiscogsApiClient();
-        $this->discogs->cacheEnabled = false;
+        $this->playlist = $playlist;
+        $this->synchronization = $synchronization;
     }
 
     /**
@@ -39,22 +46,10 @@ class SyncPlaylist implements ShouldQueue
      * @return void
      * @throws Exception|GuzzleException
      */
-    #[NoReturn] public function handle(): void
+    public function handle(): void
     {
-        $this->syncFolders();
-    }
-
-    /**
-     * @throws GuzzleException
-     * @throws DiscogsApiException
-     */
-    private function syncFolders()
-    {
-        $folders = $this->discogs->get('users/gerbster/collection/folders');
-
-        foreach ($folders['folders'] as $folder)
-        {
-
+        foreach ($this->synchronization->discogs_data as $discogsEntry) {
+            SearchSpotify::dispatch($this->playlist, $this->synchronization, $discogsEntry);
         }
     }
 }

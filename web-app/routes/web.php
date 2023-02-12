@@ -40,7 +40,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/setup/spotify', [SpotifyAuthController::class, 'setup'])
         ->name('app.setup.spotify');
     Route::get('/auth/spotify/connect', function () {
-        return Socialite::driver('spotify')->redirect();
+        return Socialite::driver('spotify')->scopes([
+            'playlist-read-private',
+            'playlist-read-collaborative',
+            'playlist-modify-private',
+            'playlist-modify-public',
+        ])->redirect();
     })->name('auth.spotify.connect');
     Route::get('/auth/spotify/callback', [SpotifyAuthController::class, 'callback'])
         ->name('auth.spotify.callback');
@@ -55,4 +60,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/app/playlist', [PlaylistController::class, 'index'])
         ->name('app.playlist');
+
+    Route::get('/app/playlist/test', [PlaylistController::class, 'test'])
+        ->name('app.playlist.test');
 });
