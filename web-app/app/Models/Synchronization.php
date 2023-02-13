@@ -17,6 +17,12 @@ use Jenssegers\Mongodb\Eloquent\Model;
  */
 class Synchronization extends Model
 {
+    const STATUS_READY_FOR_START = 1;
+    const STATUS_RETRIEVING_DISCOGS_DATA = 2;
+    const STATUS_RETRIEVING_SPOTIFY_DATA = 3;
+    const STATUS_UPDATING_SPOTIFY_PLAYLIST = 4;
+    const STATUS_DONE = 4;
+
     /**
      * @var string
      */
@@ -36,6 +42,7 @@ class Synchronization extends Model
      * @var string[]
      */
     protected $fillable = [
+        'status_id',
         'associated_playlist_id',
         'discogs_data',
         'spotify_data'

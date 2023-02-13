@@ -44,7 +44,7 @@ class SyncPlaylist implements ShouldQueue
      * Execute the job.
      *
      * @return void
-     * @throws Exception|GuzzleException
+     * @throws Exception
      */
     public function handle(): void
     {
