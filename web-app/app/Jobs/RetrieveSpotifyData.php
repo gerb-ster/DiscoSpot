@@ -90,7 +90,7 @@ class RetrieveSpotifyData implements ShouldQueue
                 );
             }
 
-            $batch = Bus::batch($jobs)->then(function (Batch $batch) {
+            Bus::batch($jobs)->then(function (Batch $batch) {
 
             })->catch(function (Batch $batch, Throwable $e) {
                 // First batch job failure detected...

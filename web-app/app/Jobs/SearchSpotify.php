@@ -3,8 +3,10 @@
 namespace App\Jobs;
 
 use App\Models\Playlist;
+use App\Models\SpotifyTrack;
 use App\Models\Synchronization;
 use Exception;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,7 +17,7 @@ use SpotifyWebAPI\SpotifyWebAPI;
 
 class SearchSpotify implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var Playlist
@@ -109,13 +111,27 @@ class SearchSpotify implements ShouldQueue
      */
     private function addTracksToPlaylist(array $trackUris): void
     {
+
+
+        // remove any tracks which are already in the playlist, no need to re-add them
         foreach ($trackUris as $key => $value) {
-            if (in_array($value, $this->synchronization->spotify_data)) {
+            $spotifyTrack = new SpotifyTrack([
+                'track_uri' => $value,
+                'type' => 'new',
+                'synchronization_id' => $this->synchronization->id
+            ]);
+
+            $spotifyTrack->save();
+
+            if (in_array($value, $this->synchronization->current_spotify_tracks_cache)) {
                 unset($trackUris[$key]);
             }
         }
 
+        $this->synchronization->save();
+
         if(count($trackUris) > 0) {
+            // add track to playlist
             $this->api->addPlaylistTracks($this->playlist->spotify_identifier, $trackUris);
         }
     }

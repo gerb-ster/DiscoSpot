@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Jenssegers\Mongodb\Eloquent\Model;
+use Jenssegers\Mongodb\Relations\EmbedsMany;
 
 /**
  * Class Synchronization
@@ -11,7 +12,7 @@ use Jenssegers\Mongodb\Eloquent\Model;
  * @property int $id
  * @property int $associated_playlist_id
  * @property array $discogs_data
- * @property array $spotify_data
+ * @property array $current_spotify_tracks_cache
  *
  * @package App\Models
  */
@@ -21,7 +22,7 @@ class Synchronization extends Model
     const STATUS_RETRIEVING_DISCOGS_DATA = 2;
     const STATUS_RETRIEVING_SPOTIFY_DATA = 3;
     const STATUS_UPDATING_SPOTIFY_PLAYLIST = 4;
-    const STATUS_DONE = 4;
+    const STATUS_DONE = 5;
 
     /**
      * @var string
@@ -45,6 +46,6 @@ class Synchronization extends Model
         'status_id',
         'associated_playlist_id',
         'discogs_data',
-        'spotify_data'
+        'current_spotify_tracks_cache'
     ];
 }

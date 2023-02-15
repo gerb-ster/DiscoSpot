@@ -3,17 +3,14 @@
 namespace App\Jobs;
 
 use App\Models\Playlist;
+use App\Models\SpotifyTrack;
 use App\Models\Synchronization;
-use App\Service\DiscogsApiClient;
-use App\Service\DiscogsApiException;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use JetBrains\PhpStorm\NoReturn;
 
 class SyncPlaylist implements ShouldQueue
 {
@@ -48,6 +45,16 @@ class SyncPlaylist implements ShouldQueue
      */
     public function handle(): void
     {
+        $current = SpotifyTrack
+            ::where('type', 'current')
+            ->where('synchronization_id', $this->synchronization->id)
+            ->get();
+
+        if ($current->isNotEmpty()) {
+            $this->synchronization->current_spotify_tracks_cache = $current->pluck('track_uri')->all();
+            $this->synchronization->save();
+        }
+
         foreach ($this->synchronization->discogs_data as $discogsEntry) {
             SearchSpotify::dispatch($this->playlist, $this->synchronization, $discogsEntry);
         }

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Playlist;
+use App\Models\SpotifyTrack;
 use App\Models\Synchronization;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
@@ -55,17 +56,18 @@ class RetrieveSpotifyTracks implements ShouldQueue
         $api->setAccessToken($this->playlist->owner->spotify_token);
 
         $tracks = $api->getPlaylistTracks($this->playlist->spotify_identifier, [
-            'offset' => $this->offset,
+            'offset' => $this->offset * 100,
             'limit' => 100
         ]);
 
-        $trackUris = [];
-        foreach ($tracks->items as $entry) {
-            $trackUris[] = $entry->track->uri;
-        }
+        foreach ($tracks->items as $value) {
+            $spotifyTrack = new SpotifyTrack([
+                'track_uri' => $value->track->uri,
+                'type' => 'current',
+                'synchronization_id' => $this->synchronization->id
+            ]);
 
-        $this->synchronization->refresh();
-        $this->synchronization->spotify_data = array_merge($this->synchronization->spotify_data, $trackUris);
-        $this->synchronization->save();
+            $spotifyTrack->save();
+        }
     }
 }

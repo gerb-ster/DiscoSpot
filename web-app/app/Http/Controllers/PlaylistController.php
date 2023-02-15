@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RemoveTracksFromPlaylist;
 use App\Jobs\RetrieveDiscogsData;
 use App\Jobs\RetrieveSpotifyData;
 use App\Jobs\SyncPlaylist;
@@ -13,9 +14,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
-use SpotifyWebAPI\SpotifyWebAPI;
 use Throwable;
 
 class PlaylistController extends Controller
@@ -26,13 +25,8 @@ class PlaylistController extends Controller
      */
     public function index(Request $request): Factory|View|Application
     {
-        $api = new SpotifyWebAPI();
-        $api->setAccessToken(Auth::user()->spotify_token);
-
         // return view
-        return view('playlist.index', [
-            'output' => $api->search('artist:"donald byrd" album:"Street Lady"', 'album')
-        ]);
+        return view('playlist.index', []);
     }
 
     /**
@@ -46,7 +40,7 @@ class PlaylistController extends Controller
         $playlist->name = "My First Playlist!";
         $playlist->playlist_type_id = PlaylistType::BASED_ON_FOLDER;
         $playlist->last_sync = Carbon::now();
-        $playlist->spotify_identifier = "1ENsjXMnWaa3F5czbOE8g4";
+        $playlist->spotify_identifier = "1V5WugadOoDMMhBb26zR4k";
         $playlist->discogs_query_data = [
             'folder_id' => 1354190,
             'filters' => [
@@ -59,7 +53,7 @@ class PlaylistController extends Controller
         $synchronization = new Synchronization([
             'associated_playlist_id' => $playlist->id,
             'discogs_data' => [],
-            'spotify_data' => []
+            'current_spotify_tracks_cache' => []
         ]);
 
         $synchronization->save();
@@ -68,6 +62,7 @@ class PlaylistController extends Controller
             new RetrieveDiscogsData($playlist, $synchronization),
             new RetrieveSpotifyData($playlist, $synchronization),
             new SyncPlaylist($playlist, $synchronization),
+            new RemoveTracksFromPlaylist($playlist, $synchronization)
         ])->catch(function (Throwable $e) {
             // A job within the chain has failed...
         })->dispatch();
