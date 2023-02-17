@@ -1,51 +1,78 @@
 <?php
 
+/**
+ * Created by Reliese Model.
+ */
+
 namespace App\Models;
 
 use Carbon\Carbon;
-use Jenssegers\Mongodb\Eloquent\Model;
-use Jenssegers\Mongodb\Relations\EmbedsMany;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 /**
  * Class Synchronization
  *
  * @property int $id
- * @property int $associated_playlist_id
- * @property array $discogs_data
- * @property array $current_spotify_tracks_cache
+ * @property string $uuid
+ * @property int $playlist_id
+ * @property int $status_id
+ * @property array $statistics
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ *
+ * @property Playlist $playlist
+ * @property SynchronizationStatus $synchronization_status
  *
  * @package App\Models
  */
 class Synchronization extends Model
 {
-    const STATUS_READY_FOR_START = 1;
-    const STATUS_RETRIEVING_DISCOGS_DATA = 2;
-    const STATUS_RETRIEVING_SPOTIFY_DATA = 3;
-    const STATUS_UPDATING_SPOTIFY_PLAYLIST = 4;
-    const STATUS_DONE = 5;
+	protected $table = 'synchronizations';
+
+	protected $casts = [
+		'playlist_id' => 'int',
+		'status_id' => 'int',
+        'statistics' => 'array'
+	];
+
+	protected $fillable = [
+		'uuid',
+		'playlist_id',
+		'status_id',
+		'statistics'
+	];
 
     /**
-     * @var string
+     * The "booting" method of the model.
+     *
+     * @return void
      */
-    protected $connection = 'mongodb';
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        // before creating, create a unique number
+        static::creating(function (Synchronization $model) {
+            $model->uuid = Str::uuid();
+        });
+    }
 
     /**
-     * @var string
+     * @return BelongsTo
      */
-    protected $collection = 'synchronizations';
+	public function playlist(): BelongsTo
+    {
+		return $this->belongsTo(Playlist::class);
+	}
 
     /**
-     * @var string[]
+     * @return BelongsTo
      */
-    protected $dates = ['created_at'];
-
-    /**
-     * @var string[]
-     */
-    protected $fillable = [
-        'status_id',
-        'associated_playlist_id',
-        'discogs_data',
-        'current_spotify_tracks_cache'
-    ];
+	public function status(): BelongsTo
+    {
+		return $this->belongsTo(SynchronizationStatus::class, 'status_id');
+	}
 }

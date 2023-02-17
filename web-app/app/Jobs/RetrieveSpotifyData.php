@@ -2,44 +2,35 @@
 
 namespace App\Jobs;
 
-use App\Models\Playlist;
 use App\Models\Synchronization;
 use Exception;
-use Illuminate\Bus\Batch;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Bus;
-use JetBrains\PhpStorm\NoReturn;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
 use Throwable;
 
 class RetrieveSpotifyData implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Playlist
+     * @var string
      */
-    private Playlist $playlist;
-
-    /**
-     * @var Synchronization
-     */
-    private Synchronization $synchronization;
+    private string $synchronizationUuid;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Playlist $playlist, Synchronization $synchronization)
+    public function __construct(string $synchronizationUuid)
     {
-        $this->playlist = $playlist;
-        $this->synchronization = $synchronization;
+        $this->synchronizationUuid = $synchronizationUuid;
     }
 
     /**
@@ -47,16 +38,19 @@ class RetrieveSpotifyData implements ShouldQueue
      *
      * @return void
      * @throws Exception
+     * @throws Throwable
      */
-    #[NoReturn] public function handle(): void
+    public function handle(): void
     {
+        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+
         $session = new Session(
             env('SPOTIFY_CLIENT_ID'),
             env('SPOTIFY_CLIENT_SECRET'),
             env('SPOTIFY_REDIRECT_URI')
         );
 
-        $session->refreshAccessToken($this->playlist->owner->spotify_refresh_token);
+        $session->refreshAccessToken($synchronization->playlist->owner->spotify_refresh_token);
 
         $accessToken = $session->getAccessToken();
         $refreshToken = $session->getRefreshToken();
@@ -64,39 +58,27 @@ class RetrieveSpotifyData implements ShouldQueue
         $api = new SpotifyWebAPI();
         $api->setAccessToken($accessToken);
 
-        $this->playlist->owner->spotify_token = $accessToken;
-        $this->playlist->owner->spotify_refresh_token = $refreshToken;
-        $this->playlist->owner->save();
+        $synchronization->playlist->owner->spotify_token = $accessToken;
+        $synchronization->playlist->owner->spotify_refresh_token = $refreshToken;
+        $synchronization->playlist->owner->save();
 
-        if(is_null($this->playlist->spotify_identifier)) {
+        if(is_null($synchronization->playlist->spotify_identifier)) {
             $spotifyPlaylist = $api->createPlaylist([
-                'name' => $this->playlist->name,
+                'name' => $synchronization->playlist->name,
                 'description' => 'DiscoSpot created playlist!'
             ]);
 
-            $this->playlist->spotify_identifier = $spotifyPlaylist->id;
-            $this->playlist->save();
+            $synchronization->playlist->spotify_identifier = $spotifyPlaylist->id;
+            $synchronization->playlist->save();
         }
 
-        $metadata = $api->getPlaylist($this->playlist->spotify_identifier);
-        $jobs = [];
+        $metadata = $api->getPlaylist($synchronization->playlist->spotify_identifier);
 
+        // hydrate the batch with jobs
         if ($metadata->tracks->total > 0) {
             for ($x = 0; $x <= ceil($metadata->tracks->total / 100); $x++) {
-                $jobs[] = new RetrieveSpotifyTracks(
-                    $this->playlist,
-                    $this->synchronization,
-                    $x
-                );
+                $this->batch()->add(new RetrieveSpotifyTracks($synchronization, $x));
             }
-
-            Bus::batch($jobs)->then(function (Batch $batch) {
-
-            })->catch(function (Batch $batch, Throwable $e) {
-                // First batch job failure detected...
-            })->finally(function (Batch $batch) {
-                // The batch has finished executing...
-            })->dispatch();
         }
     }
 }

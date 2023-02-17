@@ -2,43 +2,34 @@
 
 namespace App\Jobs;
 
-use App\Models\Playlist;
 use App\Models\Synchronization;
 use App\Service\DiscogsApiClient;
 use Exception;
-use Illuminate\Bus\Batch;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Bus;
-use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 
 class RetrieveDiscogsData implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Playlist
+     * @var string
      */
-    private Playlist $playlist;
-
-    /**
-     * @var Synchronization
-     */
-    private Synchronization $synchronization;
+    private string $synchronizationUuid;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Playlist $playlist, Synchronization $synchronization)
+    public function __construct(string $synchronizationUuid)
     {
-        $this->playlist = $playlist;
-        $this->synchronization = $synchronization;
+        $this->synchronizationUuid = $synchronizationUuid;
     }
 
     /**
@@ -48,34 +39,27 @@ class RetrieveDiscogsData implements ShouldQueue
      * @throws Exception
      * @throws Throwable
      */
-    #[NoReturn] public function handle(): void
+    public function handle(): void
     {
+        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+
         $discogsApi = new DiscogsApiClient(
-            $this->playlist->owner->discogs_token,
-            $this->playlist->owner->discogs_secret
+            $synchronization->playlist->owner->discogs_token,
+            $synchronization->playlist->owner->discogs_secret
         );
 
-        $folder_id = $this->playlist->discogs_query_data['folder_id'];
-        $folder = "/users/{$this->playlist->owner->discogs_username}/collection/folders/{$folder_id}";
+        $folder_id = $synchronization->playlist->discogs_query_data['folder_id'];
+        $folder = "/users/{$synchronization->playlist->owner->discogs_username}/collection/folders/{$folder_id}";
 
         $metadata = $discogsApi->get($folder);
-        $jobs = [];
 
+        // hydrate the batch with jobs
         for ($x = 1; $x <= ceil($metadata['count'] / 100); $x++) {
-            $jobs[] = new RetrieveDiscogsFolderContent(
-                $this->playlist,
-                $this->synchronization,
+            $this->batch()->add(new RetrieveDiscogsFolderContent(
+                $this->synchronizationUuid,
                 $folder . "/releases",
                 $x
-            );
+            ));
         }
-
-        $batch = Bus::batch($jobs)->then(function (Batch $batch) {
-
-        })->catch(function (Batch $batch, Throwable $e) {
-            // First batch job failure detected...
-        })->finally(function (Batch $batch) {
-            // The batch has finished executing...
-        })->dispatch();
     }
 }

@@ -6,10 +6,10 @@ use Jenssegers\Mongodb\Eloquent\Model;
 use Jenssegers\Mongodb\Relations\BelongsTo;
 
 /**
- * Class Synchronization
+ * Class SpotifyTrack
  *
  * @property int $id
- * @property int $synchronization_id
+ * @property int $synchronization_uuid
  * @property string $type
  * @property string $track_uri
  *
@@ -25,7 +25,7 @@ class SpotifyTrack extends Model
     /**
      * @var string
      */
-    protected $collection = 'spotify_track';
+    protected $collection = 'spotify_tracks';
 
     /**
      * @var string[]
@@ -38,6 +38,6 @@ class SpotifyTrack extends Model
     protected $fillable = [
         'track_uri',
         'type',
-        'synchronization_id'
+        'synchronization_uuid'
     ];
 }

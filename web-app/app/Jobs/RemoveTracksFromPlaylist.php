@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\Playlist;
 use App\Models\SpotifyTrack;
 use App\Models\Synchronization;
 use Exception;
@@ -18,24 +17,18 @@ class RemoveTracksFromPlaylist implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Playlist
+     * @var string
      */
-    private Playlist $playlist;
-
-    /**
-     * @var Synchronization
-     */
-    private Synchronization $synchronization;
+    private string $synchronizationUuid;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Playlist $playlist, Synchronization $synchronization)
+    public function __construct(string $synchronizationUuid)
     {
-        $this->playlist = $playlist;
-        $this->synchronization = $synchronization;
+        $this->synchronizationUuid = $synchronizationUuid;
     }
 
     /**
@@ -46,17 +39,19 @@ class RemoveTracksFromPlaylist implements ShouldQueue
      */
     public function handle(): void
     {
+        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+
         $api = new SpotifyWebAPI();
-        $api->setAccessToken($this->playlist->owner->spotify_token);
+        $api->setAccessToken($synchronization->playlist->owner->spotify_token);
 
         $pluckedCurrent = SpotifyTrack
             ::where('type', 'current')
-            ->where('synchronization_id', $this->synchronization->id)
+            ->where('synchronization_uuid', $synchronization->uuid)
             ->get();
 
         $pluckedNew = SpotifyTrack
             ::where('type', 'new')
-            ->where('synchronization_id', $this->synchronization->id)
+            ->where('synchronization_uuid', $synchronization->uuid)
             ->get();
 
 
@@ -73,6 +68,6 @@ class RemoveTracksFromPlaylist implements ShouldQueue
             ];
         }
 
-        $api->deletePlaylistTracks($this->playlist->spotify_identifier, $tracks);
+        $api->deletePlaylistTracks($synchronization->playlist->spotify_identifier, $tracks);
     }
 }

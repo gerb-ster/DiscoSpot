@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\DiscogsRelease;
 use App\Models\Playlist;
 use App\Models\SpotifyTrack;
 use App\Models\Synchronization;
@@ -20,19 +21,19 @@ class SearchSpotify implements ShouldQueue
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Playlist
+     * @var string
      */
-    private Playlist $playlist;
+    private string $synchronizationUuid;
 
     /**
-     * @var Synchronization
+     * @var DiscogsRelease
      */
-    private Synchronization $synchronization;
+    private DiscogsRelease $discogsRelease;
 
     /**
      * @var array
      */
-    private array $discogsEntry;
+    private array $currentTracksInPlaylist;
 
     /**
      * @var SpotifyWebAPI
@@ -44,11 +45,11 @@ class SearchSpotify implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Playlist $playlist, Synchronization $synchronization, array $discogsEntry)
+    public function __construct(string $synchronizationUuid, DiscogsRelease $discogsRelease, array $currentTracksInPlaylist)
     {
-        $this->playlist = $playlist;
-        $this->synchronization = $synchronization;
-        $this->discogsEntry = $discogsEntry;
+        $this->synchronizationUuid = $synchronizationUuid;
+        $this->discogsRelease = $discogsRelease;
+        $this->currentTracksInPlaylist = $currentTracksInPlaylist;
     }
 
     /**
@@ -59,25 +60,25 @@ class SearchSpotify implements ShouldQueue
      */
     public function handle(): void
     {
-        if (Cache::has($this->discogsEntry['master_id'])) {
-            $cachedIds = Cache::get($this->discogsEntry['master_id']);
+        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+
+        if (Cache::has($this->discogsRelease->master_id)) {
+            $cachedIds = Cache::get($this->discogsRelease->master_id);
 
             if ($cachedIds !== "not_found") {
                 $this->api = new SpotifyWebAPI();
-                $this->api->setAccessToken($this->playlist->owner->spotify_token);
+                $this->api->setAccessToken($synchronization->playlist->owner->spotify_token);
 
-                $this->addTracksToPlaylist($cachedIds);
+                $this->addTracksToPlaylist($synchronization, $cachedIds);
             }
 
             return;
         }
 
         $this->api = new SpotifyWebAPI();
-        $this->api->setAccessToken($this->playlist->owner->spotify_token);
+        $this->api->setAccessToken($synchronization->playlist->owner->spotify_token);
 
-        $primaryArtist = current($this->discogsEntry['artists'])['name'];
-
-        $searchResult = $this->api->search("album:{$this->discogsEntry['title']} artist:{$primaryArtist}" , [
+        $searchResult = $this->api->search("album:{$this->discogsRelease->title} artist:{$this->discogsRelease->artist}" , [
             'type' => 'album'
         ]);
 
@@ -93,46 +94,44 @@ class SearchSpotify implements ShouldQueue
                 $tracksArray[] = $track->uri;
             }
 
-            $this->addTracksToPlaylist($tracksArray);
+            $this->addTracksToPlaylist($synchronization, $tracksArray);
 
             // store in cache for later use
-            Cache::set($this->discogsEntry['master_id'], $tracksArray);
+            Cache::set($this->discogsRelease->master_id, $tracksArray);
 
             return;
         }
 
         // register as not found to cache
-        Cache::set($this->discogsEntry['master_id'], "not_found");
+        Cache::set($this->discogsRelease->master_id, "not_found");
     }
 
     /**
      * @param array $trackUris
      * @return void
      */
-    private function addTracksToPlaylist(array $trackUris): void
+    private function addTracksToPlaylist(Synchronization $synchronization, array $trackUris): void
     {
-
-
         // remove any tracks which are already in the playlist, no need to re-add them
         foreach ($trackUris as $key => $value) {
             $spotifyTrack = new SpotifyTrack([
                 'track_uri' => $value,
                 'type' => 'new',
-                'synchronization_id' => $this->synchronization->id
+                'synchronization_uuid' => $synchronization->uuid
             ]);
 
             $spotifyTrack->save();
 
-            if (in_array($value, $this->synchronization->current_spotify_tracks_cache)) {
+            if (in_array($value, $this->currentTracksInPlaylist)) {
                 unset($trackUris[$key]);
             }
         }
 
-        $this->synchronization->save();
-
         if(count($trackUris) > 0) {
             // add track to playlist
-            $this->api->addPlaylistTracks($this->playlist->spotify_identifier, $trackUris);
+            ray($trackUris);
+
+            $this->api->addPlaylistTracks($synchronization->playlist->spotify_identifier, $trackUris);
         }
     }
 }

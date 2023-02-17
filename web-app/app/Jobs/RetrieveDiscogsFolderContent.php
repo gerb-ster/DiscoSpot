@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Playlist;
+use App\Models\DiscogsRelease;
 use App\Models\Synchronization;
 use App\Service\DiscogsApiClient;
 use Illuminate\Bus\Batchable;
@@ -17,14 +17,9 @@ class RetrieveDiscogsFolderContent implements ShouldQueue
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Playlist
+     * @var string
      */
-    private Playlist $playlist;
-
-    /**
-     * @var Synchronization
-     */
-    private Synchronization $synchronization;
+    private string $synchronizationUuid;
 
     /**
      * @var string
@@ -41,10 +36,9 @@ class RetrieveDiscogsFolderContent implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Playlist $playlist, Synchronization $synchronization, string $resourceUrl, int $page)
+    public function __construct(string $synchronizationUuid, string $resourceUrl, int $page)
     {
-        $this->playlist = $playlist;
-        $this->synchronization = $synchronization;
+        $this->synchronizationUuid = $synchronizationUuid;
 
         $this->resourceUrl = $resourceUrl;
         $this->page = $page;
@@ -61,9 +55,11 @@ class RetrieveDiscogsFolderContent implements ShouldQueue
             return;
         }
 
+        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+
         $discogsApi = new DiscogsApiClient(
-            $this->playlist->owner->discogs_token,
-            $this->playlist->owner->discogs_secret
+            $synchronization->playlist->owner->discogs_token,
+            $synchronization->playlist->owner->discogs_secret
         );
 
         $folderContent = $discogsApi->get($this->resourceUrl, [
@@ -71,28 +67,29 @@ class RetrieveDiscogsFolderContent implements ShouldQueue
             'page' => $this->page
         ]);
 
-        $discogsData = [];
-
         foreach ($folderContent['releases'] as $entry) {
             // apply filters..
-            if ($this->passesFilter($entry['basic_information'])) {
-                $discogsData[] = $entry['basic_information'];
+            if ($this->passesFilter($synchronization, $entry['basic_information'])) {
+                $discogsRelease = new DiscogsRelease([
+                    'artist' => current($entry['basic_information']['artists'])['name'],
+                    'title' => $entry['basic_information']['title'],
+                    'master_id' => $entry['basic_information']['title'],
+                    'synchronization_uuid' => $this->synchronizationUuid
+                ]);
+
+                $discogsRelease->save();
             }
         }
-
-        $this->synchronization->refresh();
-
-        $this->synchronization->discogs_data = array_merge($this->synchronization->discogs_data, $discogsData);
-        $this->synchronization->save();
     }
 
     /**
+     * @param Synchronization $synchronization
      * @param array $basicInformation
      * @return bool
      */
-    private function passesFilter(array $basicInformation): bool
+    private function passesFilter(Synchronization $synchronization, array $basicInformation): bool
     {
-        foreach ($this->playlist->discogs_query_data['filters'] as $key => $value) {
+        foreach ($synchronization->playlist->discogs_query_data['filters'] as $key => $value) {
             if(array_key_exists($key, $basicInformation)) {
                 foreach ($basicInformation[$key] as $entry) {
                     if($entry['name'] === $value) {
