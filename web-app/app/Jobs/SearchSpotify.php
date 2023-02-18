@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\DiscogsRelease;
 use App\Models\Playlist;
 use App\Models\SpotifyTrack;
+use App\Models\Statistic;
 use App\Models\Synchronization;
 use Exception;
 use Illuminate\Bus\Batchable;
@@ -18,7 +19,7 @@ use SpotifyWebAPI\SpotifyWebAPI;
 
 class SearchSpotify implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Synchronize, Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var string
@@ -31,11 +32,6 @@ class SearchSpotify implements ShouldQueue
     private DiscogsRelease $discogsRelease;
 
     /**
-     * @var array
-     */
-    private array $currentTracksInPlaylist;
-
-    /**
      * @var SpotifyWebAPI
      */
     private SpotifyWebAPI $api;
@@ -45,11 +41,10 @@ class SearchSpotify implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $synchronizationUuid, DiscogsRelease $discogsRelease, array $currentTracksInPlaylist)
+    public function __construct(string $synchronizationUuid, DiscogsRelease $discogsRelease)
     {
         $this->synchronizationUuid = $synchronizationUuid;
         $this->discogsRelease = $discogsRelease;
-        $this->currentTracksInPlaylist = $currentTracksInPlaylist;
     }
 
     /**
@@ -60,7 +55,11 @@ class SearchSpotify implements ShouldQueue
      */
     public function handle(): void
     {
-        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+        if ($this->batch()->cancelled()) {
+            return;
+        }
+
+        $synchronization = $this->getSynchronization();
 
         if (Cache::has($this->discogsRelease->master_id)) {
             $cachedIds = Cache::get($this->discogsRelease->master_id);
@@ -71,6 +70,9 @@ class SearchSpotify implements ShouldQueue
 
                 $this->addTracksToPlaylist($synchronization, $cachedIds);
             }
+
+            // store some statistics
+            $this->storeStatistic(Statistic::RELEASE_NOT_FOUND, $this->discogsRelease->toArray());
 
             return;
         }
@@ -102,6 +104,9 @@ class SearchSpotify implements ShouldQueue
             return;
         }
 
+        // store some statistics
+        $this->storeStatistic(Statistic::RELEASE_NOT_FOUND, $this->discogsRelease->toArray());
+
         // register as not found to cache
         Cache::set($this->discogsRelease->master_id, "not_found");
     }
@@ -112,6 +117,8 @@ class SearchSpotify implements ShouldQueue
      */
     private function addTracksToPlaylist(Synchronization $synchronization, array $trackUris): void
     {
+        $currentTrackInPlaylist = $this->getCurrentTrackInPlaylist();
+
         // remove any tracks which are already in the playlist, no need to re-add them
         foreach ($trackUris as $key => $value) {
             $spotifyTrack = new SpotifyTrack([
@@ -122,15 +129,16 @@ class SearchSpotify implements ShouldQueue
 
             $spotifyTrack->save();
 
-            if (in_array($value, $this->currentTracksInPlaylist)) {
+            if (in_array($value, $currentTrackInPlaylist)) {
                 unset($trackUris[$key]);
             }
         }
 
         if(count($trackUris) > 0) {
-            // add track to playlist
-            ray($trackUris);
+            // store some stats
+            $this->storeStatistic(Statistic::TRACKS_ADDED_TO_PLAYLIST, $trackUris);
 
+            // add track to playlist
             $this->api->addPlaylistTracks($synchronization->playlist->spotify_identifier, $trackUris);
         }
     }

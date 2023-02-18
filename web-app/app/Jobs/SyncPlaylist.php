@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\DiscogsRelease;
 use App\Models\SpotifyTrack;
+use App\Models\Statistic;
 use App\Models\Synchronization;
 use Exception;
 use Illuminate\Bus\Batchable;
@@ -16,7 +17,7 @@ use Throwable;
 
 class SyncPlaylist implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Synchronize, Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var string
@@ -42,24 +43,19 @@ class SyncPlaylist implements ShouldQueue
      */
     public function handle(): void
     {
-        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
-
-        $current = SpotifyTrack
-            ::where('type', 'current')
-            ->where('synchronization_uuid', $synchronization->uuid)
-            ->get();
-
-        $currentTracksInPlaylist = $current->pluck('track_uri')->all();
+        $synchronization = $this->getSynchronization();
 
         $discogsReleases = DiscogsRelease
             ::where('synchronization_uuid', $synchronization->uuid)
             ->get();
 
+        // store some statistics
+        $this->storeStatistic(Statistic::RELEASES_AFTER_FILTER, $discogsReleases->count());
+
         foreach ($discogsReleases as $discogsRelease) {
             $this->batch()->add(new SearchSpotify(
                 $synchronization->uuid,
-                $discogsRelease,
-                $currentTracksInPlaylist
+                $discogsRelease
             ));
         }
     }

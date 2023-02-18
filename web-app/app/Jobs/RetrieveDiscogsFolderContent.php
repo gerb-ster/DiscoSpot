@@ -14,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
 
 class RetrieveDiscogsFolderContent implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Synchronize, Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var string
@@ -55,7 +55,7 @@ class RetrieveDiscogsFolderContent implements ShouldQueue
             return;
         }
 
-        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+        $synchronization = $this->getSynchronization();
 
         $discogsApi = new DiscogsApiClient(
             $synchronization->playlist->owner->discogs_token,

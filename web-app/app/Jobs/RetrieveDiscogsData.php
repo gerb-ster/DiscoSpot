@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Statistic;
 use App\Models\Synchronization;
 use App\Service\DiscogsApiClient;
 use Exception;
@@ -15,7 +16,7 @@ use Throwable;
 
 class RetrieveDiscogsData implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Synchronize, Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var string
@@ -41,7 +42,7 @@ class RetrieveDiscogsData implements ShouldQueue
      */
     public function handle(): void
     {
-        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+        $synchronization = $this->getSynchronization();
 
         $discogsApi = new DiscogsApiClient(
             $synchronization->playlist->owner->discogs_token,
@@ -52,6 +53,9 @@ class RetrieveDiscogsData implements ShouldQueue
         $folder = "/users/{$synchronization->playlist->owner->discogs_username}/collection/folders/{$folder_id}";
 
         $metadata = $discogsApi->get($folder);
+
+        // store some statistics
+        $this->storeStatistic(Statistic::RELEASES_IN_FOLDER, $metadata['count']);
 
         // hydrate the batch with jobs
         for ($x = 1; $x <= ceil($metadata['count'] / 100); $x++) {

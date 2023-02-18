@@ -26,12 +26,7 @@ class DiscogsApiClient
     /**
      * @var string
      */
-    protected string $userAgent = 'discoDash';
-
-    /**
-     * @var bool
-     */
-    public bool $cacheEnabled = true;
+    protected string $userAgent = 'disco-spot';
 
     /**
      */
@@ -56,18 +51,18 @@ class DiscogsApiClient
 
     /**
      * @param string $resource
-     * @param string $id
      * @param array $query
      * @param bool $mustAuthenticate
+     * @param bool $cacheEnabled
      * @return mixed
      * @throws DiscogsApiException
      * @throws GuzzleException
      */
-    public function get(string $resource, array $query = [], bool $mustAuthenticate = false): mixed
+    public function get(string $resource, array $query = [], bool $mustAuthenticate = false, bool $cacheEnabled = false): mixed
     {
         $argsHash = hash('sha256', serialize(func_get_args()));
 
-        if ($this->cacheEnabled && Cache::has($argsHash)) {
+        if ($cacheEnabled && Cache::has($argsHash)) {
            return json_decode(Cache::get($argsHash), true);
         }
 
@@ -78,7 +73,7 @@ class DiscogsApiClient
             )->getBody()
             ->getContents();
 
-        if ($this->cacheEnabled) {
+        if ($cacheEnabled) {
             Cache::set($argsHash, $content, 60);
         }
 

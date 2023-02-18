@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\SpotifyTrack;
-use App\Models\Synchronization;
+use App\Models\Statistic;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,7 +14,7 @@ use SpotifyWebAPI\SpotifyWebAPI;
 
 class RemoveTracksFromPlaylist implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Synchronize, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var string
@@ -39,7 +39,7 @@ class RemoveTracksFromPlaylist implements ShouldQueue
      */
     public function handle(): void
     {
-        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+        $synchronization = $this->getSynchronization();
 
         $api = new SpotifyWebAPI();
         $api->setAccessToken($synchronization->playlist->owner->spotify_token);
@@ -54,7 +54,6 @@ class RemoveTracksFromPlaylist implements ShouldQueue
             ->where('synchronization_uuid', $synchronization->uuid)
             ->get();
 
-
         $removedTracks = array_diff(
             $pluckedCurrent->pluck('track_uri')->all(),
             $pluckedNew->pluck('track_uri')->all()
@@ -68,6 +67,10 @@ class RemoveTracksFromPlaylist implements ShouldQueue
             ];
         }
 
+        // store some statistics
+        $this->storeStatistic(Statistic::TRACKS_REMOVED_FROM_PLAYLIST, count($tracks));
+
+        // remove any tracks
         $api->deletePlaylistTracks($synchronization->playlist->spotify_identifier, $tracks);
     }
 }

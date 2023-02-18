@@ -14,12 +14,12 @@ use SpotifyWebAPI\SpotifyWebAPI;
 
 class RetrieveSpotifyTracks implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Synchronize, Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Synchronization
+     * @var string
      */
-    private Synchronization $synchronization;
+    private string $synchronizationUuid;
 
     /**
      * @var int
@@ -31,9 +31,9 @@ class RetrieveSpotifyTracks implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Synchronization $synchronization, int $offset)
+    public function __construct(string $synchronizationUuid, int $offset)
     {
-        $this->synchronization = $synchronization;
+        $this->synchronizationUuid = $synchronizationUuid;
         $this->offset = $offset;
     }
 
@@ -44,10 +44,16 @@ class RetrieveSpotifyTracks implements ShouldQueue
      */
     public function handle(): void
     {
-        $api = new SpotifyWebAPI();
-        $api->setAccessToken($this->synchronization->playlist->owner->spotify_token);
+        if ($this->batch()->cancelled()) {
+            return;
+        }
 
-        $tracks = $api->getPlaylistTracks($this->synchronization->playlist->spotify_identifier, [
+        $synchronization = $this->getSynchronization();
+
+        $api = new SpotifyWebAPI();
+        $api->setAccessToken($synchronization->playlist->owner->spotify_token);
+
+        $tracks = $api->getPlaylistTracks($synchronization->playlist->spotify_identifier, [
             'offset' => $this->offset * 100,
             'limit' => 100
         ]);
@@ -56,7 +62,7 @@ class RetrieveSpotifyTracks implements ShouldQueue
             $spotifyTrack = new SpotifyTrack([
                 'track_uri' => $value->track->uri,
                 'type' => 'current',
-                'synchronization_uuid' => $this->synchronization->uuid
+                'synchronization_uuid' => $synchronization->uuid
             ]);
 
             $spotifyTrack->save();

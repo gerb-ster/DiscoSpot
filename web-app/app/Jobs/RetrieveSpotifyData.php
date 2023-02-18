@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Statistic;
 use App\Models\Synchronization;
 use Exception;
 use Illuminate\Bus\Batchable;
@@ -16,7 +17,7 @@ use Throwable;
 
 class RetrieveSpotifyData implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Synchronize, Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var string
@@ -42,7 +43,7 @@ class RetrieveSpotifyData implements ShouldQueue
      */
     public function handle(): void
     {
-        $synchronization = Synchronization::firstWhere('uuid', $this->synchronizationUuid);
+        $synchronization = $this->getSynchronization();
 
         $session = new Session(
             env('SPOTIFY_CLIENT_ID'),
@@ -74,10 +75,13 @@ class RetrieveSpotifyData implements ShouldQueue
 
         $metadata = $api->getPlaylist($synchronization->playlist->spotify_identifier);
 
+        // store some statistics
+        $this->storeStatistic(Statistic::TRACKS_ALREADY_IN_PLAYLIST, $metadata->tracks->total);
+
         // hydrate the batch with jobs
         if ($metadata->tracks->total > 0) {
             for ($x = 0; $x <= ceil($metadata->tracks->total / 100); $x++) {
-                $this->batch()->add(new RetrieveSpotifyTracks($synchronization, $x));
+                $this->batch()->add(new RetrieveSpotifyTracks($synchronization->uuid, $x));
             }
         }
     }

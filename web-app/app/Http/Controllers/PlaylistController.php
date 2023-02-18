@@ -75,12 +75,16 @@ class PlaylistController extends Controller
                         new RemoveTracksFromPlaylist($synchronization->uuid),
                         new CleanUpSynchronization($synchronization->uuid)
                     ])->catch(function (Throwable $e) {
-                        // A job within the chain has failed...
+                        ray($e->getMessage());
                     })->dispatch();
+                })->catch(function (Batch $batch, Throwable $e) {
+                    ray($e->getMessage());
                 })->dispatch();
+            })->catch(function (Batch $batch, Throwable $e) {
+                ray($e->getMessage());
             })->dispatch();
         })->catch(function (Batch $batch, Throwable $e) {
-            // First batch job failure detected...
+            ray($e->getMessage());
         })->finally(function (Batch $batch) {
             // The batch has finished executing...
         })->dispatch();
