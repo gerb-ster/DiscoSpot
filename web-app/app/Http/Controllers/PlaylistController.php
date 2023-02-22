@@ -10,34 +10,64 @@ use App\Jobs\SyncPlaylist;
 use App\Models\Playlist;
 use App\Models\PlaylistType;
 use App\Models\Synchronization;
-use App\Models\SynchronizationStatus;
 use Carbon\Carbon;
 use Illuminate\Bus\Batch;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
+use Inertia\Response;
 use Throwable;
 
 class PlaylistController extends Controller
 {
     /**
-     * @param Request $request
-     * @return
+     * @return Response
      */
-    public function index(Request $request): Factory|View|Application
+    public function index(): Response
     {
-        // return view
-        return view('playlist.index', []);
+        return inertia('Playlist/Index', [
+            'playlists' => Playlist::where('owner_id', Auth::user()->id)->get(),
+            'user' => Auth::user()
+        ]);
+    }
+
+    /**
+     * @param Playlist $playlist
+     * @return Response
+     */
+    public function show(Playlist $playlist): Response
+    {
+        return inertia('Playlist/Show', [
+            'playlist' => $playlist,
+            'user' => Auth::user()
+        ]);
+    }
+
+    /**
+     * @param Playlist $playlist
+     * @return Application|RedirectResponse|Redirector
+     */
+    public function sync(Playlist $playlist): Redirector|RedirectResponse|Application
+    {
+        Artisan::call('sync:start', [
+            'playlist_uuid' => $playlist->uuid
+        ]);
+
+        return redirect(route('playlist.index'))->with('success', 'Playlist Synchronization Started.');
     }
 
     /**
      * @param Request $request
-     * @return Factory|View|Application
+     * @return Redirector|Application|RedirectResponse
      * @throws Throwable
      */
-    public function test(Request $request): Factory|View|Application
+    public function store(Request $request): Redirector|Application|RedirectResponse
     {
         // create a playlist
         $playlist = new Playlist();
@@ -54,42 +84,6 @@ class PlaylistController extends Controller
 
         $playlist->save();
 
-        $synchronization = new Synchronization([
-            'playlist_id' => $playlist->id,
-            'status_id' => SynchronizationStatus::READY_FOR_START,
-            'statistics' => []
-        ]);
-        $synchronization->save();
-
-        Bus::batch([
-            new RetrieveDiscogsData($synchronization->uuid)
-        ])->then(function (Batch $batch) use ($synchronization){
-            // All jobs completed successfully...
-            Bus::batch([
-                new RetrieveSpotifyData($synchronization->uuid)
-            ])->then(function (Batch $batch) use ($synchronization){
-                Bus::batch([
-                    new SyncPlaylist($synchronization->uuid)
-                ])->then(function (Batch $batch) use ($synchronization){
-                    Bus::chain([
-                        new RemoveTracksFromPlaylist($synchronization->uuid),
-                        new CleanUpSynchronization($synchronization->uuid)
-                    ])->catch(function (Throwable $e) {
-                        ray($e->getMessage());
-                    })->dispatch();
-                })->catch(function (Batch $batch, Throwable $e) {
-                    ray($e->getMessage());
-                })->dispatch();
-            })->catch(function (Batch $batch, Throwable $e) {
-                ray($e->getMessage());
-            })->dispatch();
-        })->catch(function (Batch $batch, Throwable $e) {
-            ray($e->getMessage());
-        })->finally(function (Batch $batch) {
-            // The batch has finished executing...
-        })->dispatch();
-
-        return view('playlist.test', [
-        ]);
+        return redirect(route('playlist.index'))->with('success', 'Playlist Created.');
     }
 }

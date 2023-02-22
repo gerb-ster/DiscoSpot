@@ -1,15 +1,11 @@
 <?php
 
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscogsAuthController;
-use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\SpotifyAuthController;
-use App\Models\User;
-use App\Service\DiscogsApiClient;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use Laravel\Socialite\Facades\Socialite;
 
 /*
@@ -24,21 +20,26 @@ use Laravel\Socialite\Facades\Socialite;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+    return Inertia::render('LandingPage');
+})->name('landingpage');
 
-Route::get('/setup/discogs', [DiscogsAuthController::class, 'setup'])
-    ->name('app.setup.discogs');
+Route::get('/setup/discogs', function () {
+    return Inertia::render('Setup/Discogs');
+})->name('app.setup.discogs');
+
 Route::get('/auth/discogs/connect', function () {
     return Socialite::driver('discogs')->redirect();
 })->name('auth.discogs.connect');
+
 Route::get('/auth/discogs/callback', [DiscogsAuthController::class, 'callback'])
     ->name('auth.discogs.callback');
 
 // User Restricted Area
 Route::group(['middleware' => ['auth']], function () {
-    Route::get('/setup/spotify', [SpotifyAuthController::class, 'setup'])
-        ->name('app.setup.spotify');
+    Route::get('/setup/spotify', function () {
+        return Inertia::render('Setup/Spotify');
+    })->name('app.setup.spotify');
+
     Route::get('/auth/spotify/connect', function () {
         return Socialite::driver('spotify')->scopes([
             'playlist-read-private',
@@ -47,20 +48,28 @@ Route::group(['middleware' => ['auth']], function () {
             'playlist-modify-public',
         ])->redirect();
     })->name('auth.spotify.connect');
+
     Route::get('/auth/spotify/callback', [SpotifyAuthController::class, 'callback'])
         ->name('auth.spotify.callback');
 
-    Route::get('/account/settings', [AccountController::class, 'settings'])
-        ->name('account.settings');
-    Route::get('/account/sign-out', [AccountController::class, 'signOut'])
-        ->name('account.sign-out');
+    Route::get('/my-account', [AccountController::class, 'settings'])
+        ->name('account');
+    Route::get('/sign-out', [AccountController::class, 'signOut'])
+        ->name('sign-out');
 
-    Route::get('/app/dashboard', [DashboardController::class, 'index'])
-        ->name('app.dashboard');
+    Route::get('/playlist/list', [PlaylistController::class, 'index'])
+        ->name('playlist.index');
 
-    Route::get('/app/playlist', [PlaylistController::class, 'index'])
-        ->name('app.playlist');
+    Route::get('/playlist/{playlist}/show', [PlaylistController::class, 'show'])
+        ->name('playlist.show');
 
-    Route::get('/app/playlist/test', [PlaylistController::class, 'test'])
-        ->name('app.playlist.test');
+    Route::get('/playlist/{playlist}/sync', [PlaylistController::class, 'sync'])
+        ->name('playlist.sync');
+
+    Route::get('/playlist/create', function () {
+        return Inertia::render('Playlist/Create');
+    })->name('playlist.create');
+
+    Route::get('/playlist/store', [PlaylistController::class, 'store'])
+        ->name('playlist.store');
 });

@@ -6,17 +6,19 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Inertia\Response;
+use Inertia\ResponseFactory;
 
 class AccountController extends Controller
 {
     /**
-     * @return View
+     * @return Response|ResponseFactory
      */
-    public function settings(): View
+    public function settings(): Response|ResponseFactory
     {
         // return view
-        return view('account.settings', [
+        return inertia('Account/Index', [
+            'user' => Auth::user()
         ]);
     }
 
@@ -26,6 +28,7 @@ class AccountController extends Controller
     public function signOut(): Redirector|RedirectResponse|Application
     {
         Auth::logout();
-        return redirect(route('welcome'));
+
+        return redirect(route('landingpage'));
     }
 }

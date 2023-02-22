@@ -8,6 +8,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
@@ -31,6 +32,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $updated_at
  *
  * @property Collection|Playlist[] $playlists
+ * @property AccountType $account
  *
  * @package App\Models
  */
@@ -86,4 +88,12 @@ class User extends Authenticatable
     {
 		return $this->hasMany(Playlist::class, 'owner_id');
 	}
+
+    /**
+     * @return BelongsTo
+     */
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(AccountType::class, 'account_type_id');
+    }
 }

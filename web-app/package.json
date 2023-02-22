@@ -2,23 +2,31 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "fix:eslint": "eslint --ext .js,.vue resources/js/ --fix",
+        "fix:prettier": "prettier --write --loglevel warn 'resources/js/**/*.vue'"
     },
     "devDependencies": {
+        "@mdi/font": "^7.1.96",
         "autoprefixer": "^10.4.13",
         "axios": "^1.1.2",
-        "laravel-vite-plugin": "^0.7.2",
+        "laravel-vite-plugin": "^0.7.4",
         "lodash": "^4.17.19",
+        "material-design-icons-iconfont": "^6.7.0",
         "postcss": "^8.4.21",
         "postcss-cli": "^10.1.0",
-        "tailwindcss": "^3.2.6",
-        "vite": "^4.1.1"
+        "vite": "^4.1.2"
     },
     "dependencies": {
+        "@inertiajs/inertia-vue3": "^0.6.0",
+        "@inertiajs/vue3": "^1.0.2",
+        "@mdi/svg": "^7.1.96",
+        "@vitejs/plugin-vue": "^4.0.0",
         "alpinejs": "^3.11.1",
         "cli": "^1.0.1",
         "flowbite": "^1.6.3",
         "highlight.js": "^11.7.0",
-        "tailwindcss-transforms": "^2.2.0"
+        "vite-plugin-vuetify": "^1.0.2",
+        "vuetify": "^3.1.5"
     }
 }

@@ -25,12 +25,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class SynchronizationStatus extends Model
 {
-    const READY_FOR_START = 1;
-    const RETRIEVING_DISCOGS_DATA = 2;
-    const RETRIEVING_SPOTIFY_DATA = 3;
-    const UPDATING_SPOTIFY_PLAYLIST = 4;
-    const CLEANING_UP = 5;
-    const DONE = 6;
+    const CREATED = 1;
+    const RUNNING = 2;
+    const FINISHED_WITH_SUCCESS = 3;
+    const FINISHED_WITH_FAILURE = 4;
 
 	protected $table = 'synchronization_status';
 

@@ -56,6 +56,7 @@ class Synchronization extends Model
 
         // before creating, create a unique number
         static::creating(function (Synchronization $model) {
+            $model->status_id = SynchronizationStatus::CREATED;
             $model->uuid = Str::uuid();
         });
     }

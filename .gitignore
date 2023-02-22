@@ -16,5 +16,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-/mongo/mongodb_vols/db/*
-/mongo/mongodb_vols/config/*
+/mongodb/mongodb_vols/db/*
+/mongodb/mongodb_vols/config/*
