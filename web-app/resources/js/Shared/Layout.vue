@@ -30,7 +30,7 @@
                 <v-sheet
                     min-height="70vh"
                     rounded="lg"
-                    class="d-flex mx-auto pa-6"
+                    class="d-flex flex-column mx-auto pa-6"
                 >
                     <slot />
                 </v-sheet>

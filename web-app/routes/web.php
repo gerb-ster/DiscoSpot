@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DiscogsAuthController;
+use App\Http\Controllers\DiscogsController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\SpotifyAuthController;
 use Illuminate\Support\Facades\Route;
@@ -59,17 +60,15 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/playlist/list', [PlaylistController::class, 'index'])
         ->name('playlist.index');
-
     Route::get('/playlist/{playlist}/show', [PlaylistController::class, 'show'])
         ->name('playlist.show');
-
+    Route::get('/playlist/create', [PlaylistController::class, 'create'])
+        ->name('playlist.create');
+    Route::get('/playlist/store', [PlaylistController::class, 'store'])
+        ->name('playlist.store');
     Route::get('/playlist/{playlist}/sync', [PlaylistController::class, 'sync'])
         ->name('playlist.sync');
 
-    Route::get('/playlist/create', function () {
-        return Inertia::render('Playlist/Create');
-    })->name('playlist.create');
-
-    Route::get('/playlist/store', [PlaylistController::class, 'store'])
-        ->name('playlist.store');
+    Route::get('/discogs/get-folders', [DiscogsController::class, 'getFolders'])
+        ->name('discogs.get-folders');
 });

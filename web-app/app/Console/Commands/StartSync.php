@@ -9,14 +9,12 @@ use App\Jobs\RetrieveSpotifyData;
 use App\Jobs\SyncPlaylist;
 use App\Models\Playlist;
 use App\Models\Synchronization;
-use App\Service\DiscogsApiClient;
-use App\Service\DiscogsApiException;
+use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Batch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
-use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 
 class StartSync extends Command
@@ -56,6 +54,9 @@ class StartSync extends Command
         $uuid = $this->argument('playlist_uuid');
 
         $playlist = Playlist::firstWhere('uuid', $uuid);
+        $playlist->last_sync = Carbon::now();
+
+        $playlist->save();
 
         $synchronization = new Synchronization([
             'playlist_id' => $playlist->id,
