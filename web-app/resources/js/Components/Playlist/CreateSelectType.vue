@@ -7,7 +7,7 @@
     ></v-text-field>
     <v-select
         label="Playlist Type"
-        :items="[]"
+        :items="playlistTypes"
         item-title="name"
         item-value="id"
         v-model="selectedItem"
@@ -29,6 +29,9 @@ export default {
         selectedItem: null,
         name: null,
     }),
+    props: {
+        playlistTypes: Object,
+    },
     methods: {
         onNextClick: function() {
             this.$emit("customChange", 'CreateSelectFolder')

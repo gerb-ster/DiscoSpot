@@ -60,7 +60,7 @@ services:
     entrypoint: [ "npm", "run", "dev" ]
     working_dir: /var/www/html
     ports:
-      - "12002:12002"
+      - "12009:12009"
     networks:
       - app-network
   disco_spot_mongodb:

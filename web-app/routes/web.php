@@ -53,8 +53,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/auth/spotify/callback', [SpotifyAuthController::class, 'callback'])
         ->name('auth.spotify.callback');
 
-    Route::get('/my-account', [AccountController::class, 'settings'])
-        ->name('account');
+    Route::get('/my-account', [AccountController::class, 'index'])
+        ->name('account.index');
+    Route::post('/my-account/save', [AccountController::class, 'save'])
+        ->name('account.save');
     Route::get('/sign-out', [AccountController::class, 'signOut'])
         ->name('sign-out');
 

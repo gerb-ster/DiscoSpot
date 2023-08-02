@@ -7,6 +7,7 @@
                     <form @submit.prevent="submit">
                         <component
                             v-bind:is="currentStep"
+                            v-bind="$props"
                             @custom-change="handleCustomChange"
                         />
                     </form>
