@@ -1,28 +1,5 @@
 <template>
     <v-app id="layout">
-        <v-app-bar flat v-if="auth.user">
-            <v-container class="fill-height d-flex align-center">
-                <v-avatar
-                    class="me-10 ms-4"
-                    color="grey-darken-1"
-                    size="32"
-                ></v-avatar>
-                <v-app-bar-title>DiscoSpot</v-app-bar-title>
-                <v-menu>
-                    <template v-slot:activator="{ props }">
-                        <v-btn append-icon="mdi-account-circle" v-bind="props">{{ auth.user.name }}</v-btn>
-                    </template>
-                    <v-list>
-                        <v-list-item :href="$route('account')">
-                            <v-list-item-title>Account</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item :href="$route('sign-out')">
-                            <v-list-item-title>Sign Out</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </v-container>
-        </v-app-bar>
         <v-main class="backgroundGradient">
             <v-container>
                 <slot />

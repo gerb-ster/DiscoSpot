@@ -1,5 +1,5 @@
 <template>
-    <Head title="Landing Page" />
+    <Head :title="$t('landingPage.title')" />
     <div class="d-flex align-center flex-column">
         <v-card
             width="400"
@@ -38,6 +38,6 @@
 
 <script setup>
 
-defineOptions({ layout: '' })
+import { Head } from '@inertiajs/vue3'
 
 </script>
