@@ -16,6 +16,9 @@ import en from '../lang/en.json';
 import nl from '../lang/nl.json';
 import {createI18n} from "vue-i18n";
 
+// Custom theming
+import '../sass/app.scss';
+
 const i18n = createI18n({
     locale: 'en',
     fallbackLocale: 'en',

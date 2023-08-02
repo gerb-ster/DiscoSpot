@@ -1,6 +1,6 @@
 <template>
     <v-app id="layout">
-        <v-app-bar flat>
+        <v-app-bar flat v-if="auth.user">
             <v-container class="fill-height d-flex align-center">
                 <v-avatar
                     class="me-10 ms-4"
@@ -8,7 +8,7 @@
                     size="32"
                 ></v-avatar>
                 <v-app-bar-title>DiscoSpot</v-app-bar-title>
-                <v-menu v-if="auth.user">
+                <v-menu>
                     <template v-slot:activator="{ props }">
                         <v-btn append-icon="mdi-account-circle" v-bind="props">{{ auth.user.name }}</v-btn>
                     </template>
@@ -23,17 +23,9 @@
                 </v-menu>
             </v-container>
         </v-app-bar>
-        <v-main class="bg-grey-lighten-3">
+        <v-main class="backgroundGradient">
             <v-container>
-                <v-breadcrumbs :items="['Foo', 'Bar', 'Fizz']"></v-breadcrumbs>
-                <flash-messages />
-                <v-sheet
-                    min-height="70vh"
-                    rounded="lg"
-                    class="d-flex flex-column mx-auto pa-6"
-                >
-                    <slot />
-                </v-sheet>
+                <slot />
             </v-container>
         </v-main>
     </v-app>

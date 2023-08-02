@@ -1,29 +1,43 @@
 <template>
     <Head title="Landing Page" />
-    <div>
-        <h2 class="text-h4 font-weight-black text-purple">Get Synchronized!</h2>
-        <p class="text-body-2 mb-4">
-            Create Playlists in Spotify based on your Discogs Record Collection
-        </p>
-        <v-btn
-            prepend-icon="mdi-rocket-launch"
-            color="indigo-darken-2"
-            size="large"
-            :href="$route('auth.discogs.connect')"
+    <div class="d-flex align-center flex-column">
+        <v-card
+            width="400"
+            class="mt-10"
         >
-            Get Started!
-        </v-btn>
+            <v-img
+                class="logoBackground"
+                height="200px"
+                src="/images/logo_placeholder.png"
+                contain
+            />
+            <v-card-title
+                class="text-h5 mb-4 mt-2"
+            >
+                {{ $t('landingPage.title') }}
+            </v-card-title>
+            <v-card-text
+                class="text-body-1"
+            >
+                {{ $t('landingPage.text') }}
+            </v-card-text>
+            <v-card-actions>
+                <v-btn
+                    prepend-icon="mdi-rocket-launch"
+                    size="large"
+                    variant="tonal"
+                    class="flex-grow-1 mt-5"
+                    :href="$route('auth.discogs.connect')"
+                >
+                    {{ $t('landingPage.startBtn') }}
+                </v-btn>
+            </v-card-actions>
+        </v-card>
     </div>
 </template>
 
-<script>
-import { Head } from '@inertiajs/inertia-vue3'
-import Layout from '../Shared/Layout.vue'
+<script setup>
 
-export default {
-    components: {
-        Head,
-    },
-    layout: Layout,
-}
+defineOptions({ layout: '' })
+
 </script>

@@ -1,0 +1,17 @@
+@use 'vuetify' with (
+  $body-font-family: "Open Sans",
+  $heading-font-family: "Righteous",
+  $font-size-root: 14px
+);
+
+@import "@fontsource/open-sans";
+@import "@fontsource/righteous";
+
+.backgroundGradient {
+    background: rgb(29,185,84);
+    background: linear-gradient(135deg, rgba(29,185,84,1) 0%, rgba(25,20,20,1) 76%, rgba(51,51,51,1) 100%);
+}
+
+.logoBackground {
+    background: #1e252a;
+}

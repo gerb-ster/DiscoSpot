@@ -24,6 +24,7 @@
     "dependencies": {
         "@fontsource/merriweather": "^4.5.14",
         "@fontsource/open-sans": "^4.5.14",
+        "@fontsource/righteous": "^5.0.5",
         "@growthbunker/vueflags": "^0.1.14",
         "@inertiajs/inertia-vue3": "^0.6.0",
         "@inertiajs/vue3": "^1.0.2",
