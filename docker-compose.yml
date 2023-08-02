@@ -1,0 +1,83 @@
+version: "3.2"
+services:
+  disco_spot_laravel:
+    container_name: disco_spot_laravel
+    build:
+      context: ./web-app
+      dockerfile: docker/laravel.dockerfile
+    image: laravel
+    tty: true
+    environment:
+      TZ: Europe/Amsterdam
+      SERVICE_NAME: laravel
+      SERVICE_TAGS: dev
+    working_dir: /var/www/html/
+    volumes:
+      - ./web-app:/var/www/html/
+    networks:
+      - app-network
+  disco_spot_webserver:
+    container_name: disco_spot_webserver
+    depends_on:
+      - disco_spot_laravel
+    build:
+      context: nginx
+      dockerfile: nginx.dockerfile
+    tty: true
+    ports:
+      - "12001:80"
+    networks:
+      - app-network
+  disco_spot_memcached:
+    container_name: disco_spot_memcached
+    image: "memcached:latest"
+    networks:
+      - app-network
+  disco_spot_beanstalkd:
+    container_name: disco_spot_beanstalkd
+    build:
+      context: beanstalkd
+      dockerfile: beanstalkd.dockerfile
+    networks:
+      - app-network
+  disco_spot_mariadb:
+    container_name: disco_spot_mariadb
+    image: "mariadb:latest"
+    ports:
+      - "12003:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "disco_spot"
+      MYSQL_USER: "disco_spot"
+      MYSQL_PASSWORD: "secret"
+    networks:
+      - app-network
+  disco_spot_npm:
+    container_name: disco_spot_npm
+    image: node:current-alpine
+    volumes:
+      - ./web-app:/var/www/html
+    entrypoint: [ "npm", "run", "dev" ]
+    working_dir: /var/www/html
+    ports:
+      - "12009:12009"
+    networks:
+      - app-network
+  disco_spot_mongodb:
+    container_name: disco_spot_mongodb
+    image: mongo:latest
+    volumes:
+      - ./mongodb/mongodb_vols/db:/data/db
+      - ./mongodb/mongodb_vols/config:/data/configdb
+    environment:
+      # provide your credentials here
+      - TZ=Europe/Amsterdam
+      - MONGO_INITDB_ROOT_USERNAME=disco_spot
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    ports:
+      - "12004:27017"
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge

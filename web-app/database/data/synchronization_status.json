@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "READY_FOR_START"
+    },
+    {
+        "id": 2,
+        "name": "RETRIEVING_DISCOGS_DATA"
+    },
+    {
+        "id": 3,
+        "name": "RETRIEVING_SPOTIFY_DATA"
+    },
+    {
+        "id": 4,
+        "name": "UPDATING_SPOTIFY_PLAYLIST"
+    },
+    {
+        "id": 5,
+        "name": "CLEANING_UP"
+    },
+    {
+        "id": 6,
+        "name": "DONE"
+    }
+]
