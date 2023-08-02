@@ -11,5 +11,15 @@
     "playlistIndex": {
         "pageTitle": "My Playlists",
         "title": "My Playlists"
+    },
+    "accountIndex": {
+        "title": "Your Account",
+        "name": "Name",
+        "email": "Email-address",
+        "accountType": "Account Type",
+        "discogsUsername": "Discogs Username",
+        "spotifyUsername": "Spotify Username",
+        "signOut": "Sign out from DiscoSpot",
+        "removeAccount": "Remove your account"
     }
 }
