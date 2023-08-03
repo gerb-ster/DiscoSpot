@@ -55,6 +55,7 @@ class StartSync extends Command
 
         $playlist = Playlist::firstWhere('uuid', $uuid);
         $playlist->last_sync = Carbon::now();
+        $playlist->is_synchronizing = true;
 
         $playlist->save();
 
@@ -88,8 +89,10 @@ class StartSync extends Command
             })->dispatch();
         })->catch(function (Batch $batch, Throwable $e) {
             ray($e->getMessage());
-        })->finally(function (Batch $batch) {
+        })->finally(function (Batch $batch) use ($playlist) {
             // The batch has finished executing...
+            $playlist->is_synchronizing = false;
+            $playlist->save();
         })->dispatch();
 
         return 0;

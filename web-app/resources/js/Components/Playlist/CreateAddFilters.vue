@@ -1,8 +1,5 @@
 <template>
-    <v-card
-        bg-color="transparent"
-        flat
-    >
+    <v-card color="transparent">
         <h5 class="text-h5 mb-6">Add Filters</h5>
         <div v-for="(filterItem, index) in form.filterItems">
             <v-row>
@@ -22,16 +19,21 @@
                         v-model="filterItem.value"
                     ></v-text-field>
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="2" class="d-flex">
+                    <v-spacer />
                     <v-btn
                         icon="mdi-close"
+                        color="deep-orange-darken-3"
                         @click="removeFilterItem(index)"
                     ></v-btn>
                 </v-col>
             </v-row>
         </div>
         <v-btn
-            class="me-4"
+            class="me-4 mb-3"
+            variant="flat"
+            prepend-icon="mdi-plus"
+            color="green-lighten-3"
             @click="addFilterItem()"
         >
             Add Filter Item

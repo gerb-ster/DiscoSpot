@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string $spotify_identifier
  * @property Carbon $last_sync
+ * @property boolean $is_synchronizing
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  *
@@ -37,7 +38,8 @@ class Playlist extends Model
 	protected $casts = [
 		'owner_id' => 'int',
 		'playlist_type_id' => 'int',
-        'discogs_query_data' => 'array'
+        'discogs_query_data' => 'array',
+        'is_synchronizing' => 'boolean'
 	];
 
 	protected $dates = [
@@ -51,7 +53,8 @@ class Playlist extends Model
 		'discogs_query_data',
 		'name',
 		'spotify_identifier',
-		'last_sync'
+		'last_sync',
+        'is_synchronizing'
 	];
 
     /**

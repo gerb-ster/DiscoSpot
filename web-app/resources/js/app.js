@@ -9,7 +9,7 @@ import {createVuetify} from 'vuetify'
 import * as directives from 'vuetify/directives'
 import {aliases, mdi} from 'vuetify/iconsets/mdi'
 import { VDataTable, VDataTableServer } from "vuetify/labs/VDataTable";
-import { VStepper, VStepperActions } from 'vuetify/labs/VStepper'
+import { VStepper, VStepperActions, VStepperHeader, VStepperWindow, VStepperItem, VStepperWindowItem } from 'vuetify/labs/VStepper'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import en from '../lang/en.json';
@@ -34,7 +34,11 @@ const vuetify = createVuetify({
         VDataTable,
         VDataTableServer,
         VStepper,
-        VStepperActions
+        VStepperActions,
+        VStepperHeader,
+        VStepperWindow,
+        VStepperItem,
+        VStepperWindowItem
     },
     directives,
     icons: {

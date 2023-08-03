@@ -14,11 +14,14 @@
                         target="_blank"
                     >{{ $t('playlistShow.openPlaylistSpotify') }}</v-btn>
                 </p>
+                <p class="text-body-1 mb-2">
+                    {{ t('playlistTypes.'+playlist.playlist_type.name) }}
+                </p>
                 <p class="text-caption mb-4">
                     {{ $t('playlistShow.lastSynced') }} @ {{ playlist.last_sync }}
                 </p>
             </v-col>
-            <v-col class="mt-3 mb-3 ms-3" cols="12">
+            <v-col class="mt-3 mb-5 ms-3" cols="12">
                 <v-btn
                     class="me-3"
                     prepend-icon="mdi-trash-can"
@@ -33,13 +36,31 @@
                     color="deep-orange-darken-1"
                     variant="flat"
                     :href="$route('playlist.sync', playlist.uuid)"
+                    :disabled="playlist.is_synchronizing"
+                    :loading="playlist.is_synchronizing"
+                    class="active"
                 >
                     {{ $t('playlistShow.syncPlaylistBtn') }}
+                    <template v-slot:loader>
+                        <v-progress-circular
+                            :size="20"
+                            :width="3"
+                            indeterminate
+                            class="me-2"
+                        ></v-progress-circular>
+                        {{ $t('playlistShow.busySynchronizing') }}
+                    </template>
                 </v-btn>
             </v-col>
         </v-row>
     </Layout>
 </template>
+
+<style lang="scss" scoped>
+.v-btn.active .v-icon {
+    transform: rotate(-180deg);
+}
+</style>
 
 <script setup>
 

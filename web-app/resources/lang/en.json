@@ -41,6 +41,7 @@
     "playlistIndex": {
         "pageTitle": "My Playlists",
         "title": "My Playlists",
+        "introText": "This is a list of all your playlist you've created with DiscoSpot!",
         "createPlaylistBtn": "Create New Playlist"
     },
     "playlistShow": {
@@ -49,7 +50,9 @@
         "spotifyId": "Spotify Identifier",
         "openPlaylistSpotify": "Open Playlist in Spotify",
         "lastSynced": "Last synced at",
+        "neverSynced": "Not yet synced",
         "syncPlaylistBtn": "Start Synchronization",
+        "busySynchronizing": "Busy Synchronizing...",
         "deletePlaylistBtn": "Delete this playlist",
         "confirmRemoveDialogText": "Are you sure you want to delete this playlist? Your playlist will still be available in Spotify."
     },

@@ -1,8 +1,5 @@
 <template>
-    <v-card
-        bg-color="transparent"
-        flat
-    >
+    <v-card color="transparent">
         <h5 class="text-h5 mb-6">{{ $t('playlistCreate.stepThreeSummary')}}</h5>
         <p>All done</p>
         <v-btn

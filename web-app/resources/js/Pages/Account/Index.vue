@@ -33,10 +33,6 @@
                         <v-list-item-title>{{ auth.user.discogs_username }}</v-list-item-title>
                     </v-list-item>
                     <v-list-item>
-                        <v-list-item-subtitle>{{ $t('accountIndex.spotifyUsername') }}</v-list-item-subtitle>
-                        <v-list-item-title>{{ auth.user.discogs_username }}</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item>
                         <v-list-item-subtitle>{{ $t('accountIndex.accountType') }}</v-list-item-subtitle>
                         <v-list-item-title>{{ auth.user.account.name }}</v-list-item-title>
                     </v-list-item>
