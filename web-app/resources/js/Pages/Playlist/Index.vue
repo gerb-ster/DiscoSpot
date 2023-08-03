@@ -17,6 +17,7 @@
                     color="green-darken-1"
                     size="large"
                     :href="$route('playlist.create')"
+                    variant="flat"
                 >
                     {{ $t('playlistIndex.createPlaylistBtn') }}
                 </v-btn>

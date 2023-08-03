@@ -21,7 +21,7 @@ return new class extends Migration
             $table->json('discogs_query_data');
             $table->string('name', 256);
             $table->string('spotify_identifier', 256)->nullable();
-            $table->dateTime('last_sync');
+            $table->dateTime('last_sync')->nullable();
             $table->timestamps();
         });
     }

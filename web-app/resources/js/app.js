@@ -8,7 +8,8 @@ import 'vuetify/styles'
 import {createVuetify} from 'vuetify'
 import * as directives from 'vuetify/directives'
 import {aliases, mdi} from 'vuetify/iconsets/mdi'
-import {VDataTable, VDataTableServer} from "vuetify/labs/components";
+import { VDataTable, VDataTableServer } from "vuetify/labs/VDataTable";
+import { VStepper, VStepperActions } from 'vuetify/labs/VStepper'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import en from '../lang/en.json';
@@ -31,7 +32,9 @@ const i18n = createI18n({
 const vuetify = createVuetify({
     components: {
         VDataTable,
-        VDataTableServer
+        VDataTableServer,
+        VStepper,
+        VStepperActions
     },
     directives,
     icons: {

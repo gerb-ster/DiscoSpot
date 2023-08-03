@@ -112,6 +112,7 @@ class SearchSpotify implements ShouldQueue
     }
 
     /**
+     * @param Synchronization $synchronization
      * @param array $trackUris
      * @return void
      */

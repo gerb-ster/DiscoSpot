@@ -24,6 +24,10 @@ Route::get('/', function () {
     return Inertia::render('LandingPage');
 })->name('landingpage');
 
+Route::get('/get-started', function () {
+    return Inertia::render('GetStarted');
+})->name('get-started');
+
 Route::get('/setup/discogs', function () {
     return Inertia::render('Setup/Discogs');
 })->name('app.setup.discogs');
@@ -66,11 +70,16 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('playlist.show');
     Route::get('/playlist/create', [PlaylistController::class, 'create'])
         ->name('playlist.create');
-    Route::get('/playlist/store', [PlaylistController::class, 'store'])
+    Route::post('/playlist/store', [PlaylistController::class, 'store'])
         ->name('playlist.store');
     Route::get('/playlist/{playlist}/sync', [PlaylistController::class, 'sync'])
         ->name('playlist.sync');
+    Route::delete('/playlist/{playlist}', [PlaylistController::class, 'destroy'])
+        ->name('playlist.destroy');
+
 
     Route::get('/discogs/get-folders', [DiscogsController::class, 'getFolders'])
         ->name('discogs.get-folders');
+    Route::get('/discogs/get-lists', [DiscogsController::class, 'getLists'])
+        ->name('discogs.get-lists');
 });

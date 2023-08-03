@@ -3,13 +3,13 @@
         bg-color="transparent"
         flat
     >
-        <h5 class="text-h5 mb-6">{{ $t("playlistCreate.stepTwoFoldersTitle")}}</h5>
+        <h5 class="text-h5 mb-6">{{ $t("playlistCreate.stepTwoListsTitle")}}</h5>
         <v-select
-            label="Folder Items"
-            :items="folderItems"
+            label="List Items"
+            :items="listItems"
             item-title="name"
             item-value="id"
-            v-model="form.selectedFolder"
+            v-model="form.selectedList"
         ></v-select>
     </v-card>
 </template>
@@ -19,20 +19,20 @@
 import {ref} from "vue";
 
 const props = defineProps(['form']);
-const folderItems = ref([]);
+const listItems = ref([]);
 
 import axios from "axios";
 
-function loadFolders() {
-    axios.get(route('discogs.get-folders'))
+function loadLists() {
+    axios.get(route('discogs.get-lists'))
         .then((response) => {
-            folderItems.value = response.data;
+            listItems.value = response.data;
         })
         .catch(function (error) {
             console.log(error);
         });
 }
 
-loadFolders();
+loadLists();
 
 </script>

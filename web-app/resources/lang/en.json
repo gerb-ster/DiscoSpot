@@ -4,6 +4,18 @@
         "text": "Connect your Discogs & Spotify accounts and create custom playlists based on your Record or CD collection!",
         "startBtn": "Get Started!"
     },
+    "getStarted": {
+        "pageTitle": "Get Connected",
+        "title": "Getting Started",
+        "explanation": "First, we need to connect to Discogs to grant DiscoSpot access to your account. Next, we'll need to connect to your Spotify account and grant access there as well.",
+        "connectToDiscogs": "Connect to Discogs"
+    },
+    "spotifyConnect": {
+        "pageTitle": "Get Connected",
+        "title": "Connect to your Spotify account",
+        "explanation": "Next, we need to connect to Spotify to grant DiscoSpot access to your account.",
+        "connectToSpotify": "Connect to Spotify"
+    },
     "menuBar": {
         "account": "Your Account",
         "signOut": "Sign out"
@@ -12,6 +24,19 @@
         "myPlaylists": "My Playlists",
         "createPlaylist": "Create a new playlist",
         "yourAccount": "Your Account"
+    },
+    "filterTypes": {
+        "genres": "Genre",
+        "labels": "Label",
+        "artists": "Artist",
+        "styles": "Style",
+        "year": "Year",
+        "formats": "Format"
+    },
+    "playlistTypes": {
+        "based_on_folder": "Based on Discogs Folder",
+        "based_on_list": "Based on Discogs List",
+        "based_on_filter": "Based on Discogs Filter"
     },
     "playlistIndex": {
         "pageTitle": "My Playlists",
@@ -22,12 +47,26 @@
         "pageTitle": "Playlist details",
         "title": "Playlist Details",
         "spotifyId": "Spotify Identifier",
+        "openPlaylistSpotify": "Open Playlist in Spotify",
         "lastSynced": "Last synced at",
-        "syncPlaylistBtn": "Start Synchronization"
+        "syncPlaylistBtn": "Start Synchronization",
+        "deletePlaylistBtn": "Delete this playlist",
+        "confirmRemoveDialogText": "Are you sure you want to delete this playlist? Your playlist will still be available in Spotify."
     },
     "playlistCreate": {
         "pageTitle": "Create new Playlist",
-        "title": "Create new Playlist"
+        "title": "Create new Playlist",
+        "prevBtn": "Previous",
+        "nextBtn": "Next",
+        "stepOneTitle": "Name & type of your new playlist",
+        "stepTwoFoldersTitle": "Select the folder you want to convert into a playlist",
+        "stepTwoListsTitle": "Select the list you want to convert into a playlist",
+        "stepThreeSummary": "Summary",
+        "fields": {
+            "name": "Name",
+            "type": "Type"
+        },
+        "saveBtn": "Create your Playlist!"
     },
     "accountIndex": {
         "title": "Your Account",
@@ -38,5 +77,33 @@
         "spotifyUsername": "Spotify Username",
         "signOut": "Sign out from DiscoSpot",
         "removeAccount": "Remove your account"
+    },
+    "form": {
+        "create": "Add",
+        "update": "To adjust",
+        "search": "To search",
+        "loadingText": "Please wait... Loading",
+        "confirmDelete": "Are you sure you want to delete this item?",
+        "confirmBtn": "Yes",
+        "cancelBtn": "Cancel",
+        "saveBtn": "Save",
+        "uploadBtn": "Upload file",
+        "actions": "Actions",
+        "confirmRemoveDialogTitle": "To delete",
+        "confirmRemoveDialogText": "Are you sure you want to delete this item?",
+        "confirmRestoreDialogTitle": "To recover",
+        "yesBtn": "Yes",
+        "noBtn": "No",
+        "doneBtn": "Finished",
+        "withSelected": "With selected",
+        "massRemove": "To delete",
+        "massEdit": "To process",
+        "startExportBtn": "Initiate export",
+        "confirmMassRemoveDialogTitle": "To delete",
+        "confirmMassRemoveDialogText": "Are you sure you want to delete these students?",
+        "validation": {
+            "required": "This is a required field",
+            "email": "This field must contain a correct email address"
+        }
     }
 }

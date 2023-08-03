@@ -29,7 +29,7 @@
                             size="large"
                             variant="tonal"
                             class="flex-grow-1 mt-5"
-                            :href="$route('auth.discogs.connect')"
+                            :href="$route('get-started')"
                         >
                             {{ $t('landingPage.startBtn') }}
                         </v-btn>

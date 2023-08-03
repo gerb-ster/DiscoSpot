@@ -50,7 +50,7 @@ class RetrieveDiscogsData implements ShouldQueue
         );
 
         $folder_id = $synchronization->playlist->discogs_query_data['folder_id'];
-        $folder = "/users/{$synchronization->playlist->owner->discogs_username}/collection/folders/{$folder_id}";
+        $folder = "users/{$synchronization->playlist->owner->discogs_username}/collection/folders/{$folder_id}";
 
         $metadata = $discogsApi->get($folder);
 
