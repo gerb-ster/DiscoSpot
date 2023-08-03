@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -16,7 +17,7 @@ class SpotifyAuthController extends Controller
      * @param Request $request
      * @return Application|RedirectResponse|Redirector
      * @throws TokenNotFoundException
-     * @throws \Exception
+     * @throws Exception
      */
     public function callback(Request $request): Redirector|RedirectResponse|Application
     {

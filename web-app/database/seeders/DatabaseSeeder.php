@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AccountTypeSeeder::class);
         $this->call(PlaylistTypeSeeder::class);
+        $this->call(FilterTypeSeeder::class);
         $this->call(SynchronizationStatusSeeder::class);
     }
 }

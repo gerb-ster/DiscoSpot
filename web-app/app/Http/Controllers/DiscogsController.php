@@ -27,8 +27,33 @@ class DiscogsController extends Controller
         );
 
         try {
-            $response = $discogsApi->get("/users/{$user->discogs_username}/collection/folders");
+            $response = $discogsApi->get("users/{$user->discogs_username}/collection/folders");
             return response()->json($response['folders']);
+        } catch (DiscogsApiException $e) {
+            return response()->json($e->getMessage());
+        } catch (GuzzleException $e) {
+            return response()->json($e->getMessage());
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @return JsonResponse
+     */
+    public function getLists(): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $discogsApi = new DiscogsApiClient(
+            $user->discogs_token,
+            $user->discogs_secret
+        );
+
+        try {
+            $response = $discogsApi->get("users/{$user->discogs_username}/lists");
+            return response()->json($response['lists']);
         } catch (DiscogsApiException $e) {
             return response()->json($e->getMessage());
         } catch (GuzzleException $e) {

@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "genres"
+    },
+    {
+        "id": 2,
+        "name": "labels"
+    },
+    {
+        "id": 3,
+        "name": "artists"
+    },
+    {
+        "id": 4,
+        "name": "styles"
+    },
+    {
+        "id": 5,
+        "name": "year"
+    },
+    {
+        "id": 6,
+        "name": "formats"
+    }
+]
