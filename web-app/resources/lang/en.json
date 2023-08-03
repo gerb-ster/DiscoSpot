@@ -8,9 +8,26 @@
         "account": "Your Account",
         "signOut": "Sign out"
     },
+    "breadCrumbs": {
+        "myPlaylists": "My Playlists",
+        "createPlaylist": "Create a new playlist",
+        "yourAccount": "Your Account"
+    },
     "playlistIndex": {
         "pageTitle": "My Playlists",
-        "title": "My Playlists"
+        "title": "My Playlists",
+        "createPlaylistBtn": "Create New Playlist"
+    },
+    "playlistShow": {
+        "pageTitle": "Playlist details",
+        "title": "Playlist Details",
+        "spotifyId": "Spotify Identifier",
+        "lastSynced": "Last synced at",
+        "syncPlaylistBtn": "Start Synchronization"
+    },
+    "playlistCreate": {
+        "pageTitle": "Create new Playlist",
+        "title": "Create new Playlist"
     },
     "accountIndex": {
         "title": "Your Account",

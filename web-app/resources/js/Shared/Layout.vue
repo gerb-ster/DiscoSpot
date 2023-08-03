@@ -65,6 +65,11 @@
                                 </v-card>
                             </v-menu>
                         </v-toolbar>
+                        <v-breadcrumbs v-if="breadCrumbs" :items="breadCrumbs">
+                            <template v-slot:prepend>
+                                <v-icon size="small" icon="mdi-link-variant"></v-icon>
+                            </template>
+                        </v-breadcrumbs>
                         <slot />
                     </v-card>
                 </div>
@@ -75,6 +80,6 @@
 
 <script setup>
 
-const props = defineProps(['menuIcon', 'menuTitle', 'auth', 'disableMenu']);
+const props = defineProps(['menuIcon', 'menuTitle', 'auth', 'disableMenu', 'breadCrumbs']);
 
 </script>

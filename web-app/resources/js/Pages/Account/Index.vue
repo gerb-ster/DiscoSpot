@@ -1,6 +1,6 @@
 <template>
     <Head title="Account Page" />
-    <Layout menu-icon="mdi-account" :menu-title="$t('accountIndex.title')" :auth="auth" :disableMenu="true">
+    <Layout menu-icon="mdi-account" :menu-title="$t('accountIndex.title')" :auth="auth" :disableMenu="true" :bread-crumbs="breadCrumbs">
         <v-row justify="center">
             <v-col class="d-flex justify-center align-top pt-10" cols="3">
                 <v-avatar
@@ -73,18 +73,20 @@
 
 import { Head } from '@inertiajs/vue3'
 import Layout from "../../Shared/Layout.vue";
+import {ref} from "vue";
+import {useI18n} from "vue-i18n";
 
 const props = defineProps(['accountTypes', 'auth']);
+const { t } = useI18n();
 
-import { reactive } from "vue";
-import { router } from '@inertiajs/vue3'
-
-const form = reactive({
-    account_type_id: null
-})
-
-function submit() {
-    router.post(route('account.save'), form)
+const breadCrumbs = ref([{
+    title: t('breadCrumbs.myPlaylists'),
+    disabled: false,
+    href: route('playlist.index'),
+}, {
+    title: t('breadCrumbs.yourAccount'),
+    disabled: true,
 }
+]);
 
 </script>
