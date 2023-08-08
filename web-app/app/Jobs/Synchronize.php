@@ -46,4 +46,37 @@ trait Synchronize
 
         return $current->pluck('track_uri')->all();
     }
+
+    /**
+     * @param Synchronization $synchronization
+     * @param array $basicInformation
+     * @return bool
+     */
+    private function passesFilter(Synchronization $synchronization, array $basicInformation): bool
+    {
+        // no filters? please continue
+        if (empty($synchronization->playlist->discogs_query_data['filters'])) {
+            return true;
+        }
+
+        foreach ($synchronization->playlist->discogs_query_data['filters'] as $key => $value) {
+            if(array_key_exists($key, $basicInformation)) {
+                if (is_array($basicInformation[$key])) {
+                    foreach ($basicInformation[$key] as $entry) {
+                        if($entry['name'] === $value) {
+                            return true;
+                        }
+                    }
+                }
+
+                if(is_string($basicInformation[$key])) {
+                    if($basicInformation[$key] === $value) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }

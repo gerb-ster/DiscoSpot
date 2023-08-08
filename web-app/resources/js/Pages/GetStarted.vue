@@ -1,6 +1,6 @@
 <template>
     <Head :title="$t('getStarted.pageTitle')" />
-    <Layout menu-icon="mdi-connection" :menu-title="$t('getStarted.title')" :auth="auth">
+    <Layout menu-icon="mdi-connection" :menu-title="$t('getStarted.title')" :auth="auth" :disableMenu="true">
         <div class="mt-3 ms-3 mb-5">
             <h2 class="text-h4 font-weight-black mb-3">{{ $t('getStarted.title') }}</h2>
             <p class="text-body-2 mb-4">{{ $t('getStarted.explanation') }}</p>

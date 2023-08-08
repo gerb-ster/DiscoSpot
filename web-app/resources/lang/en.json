@@ -20,6 +20,17 @@
         "account": "Your Account",
         "signOut": "Sign out"
     },
+    "language": {
+        "title": "Language selection",
+        "dutch": "Dutch",
+        "english": "English",
+        "code": "us"
+    },
+    "flashMessages": {
+        "successTitle": "Great Success!",
+        "warningTitle": "Warning",
+        "errorTitle": "Something went wrong.."
+    },
     "breadCrumbs": {
         "myPlaylists": "My Playlists",
         "createPlaylist": "Create a new playlist",
@@ -36,7 +47,7 @@
     "playlistTypes": {
         "based_on_folder": "Based on Discogs Folder",
         "based_on_list": "Based on Discogs List",
-        "based_on_filter": "Based on Discogs Filter"
+        "based_on_wantlist": "Based on your Discogs Wantlist"
     },
     "playlistIndex": {
         "pageTitle": "My Playlists",
@@ -68,6 +79,12 @@
         "fields": {
             "name": "Name",
             "type": "Type"
+        },
+        "steps": {
+            "one": "Type",
+            "two": "Source",
+            "three": "Filters",
+            "four": "Summary"
         },
         "saveBtn": "Create your Playlist!"
     },

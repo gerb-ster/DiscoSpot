@@ -1,36 +1,38 @@
 <template>
-    <div>
-        <div v-if="$page.props.flash.success && show">
-            <v-alert
-                type="success"
-                title="Success"
-                text="{{ $page.props.success }}"
-            ></v-alert>
-        </div>
-        <div v-if="($page.props.flash.error || Object.keys($page.props.errors).length > 0) && show">
-            <v-alert
-                type="error"
-                title="Error"
-                text="{{ $page.props.errors }}"
-            ></v-alert>
-        </div>
-    </div>
+    <v-alert
+        v-if="$page.props.flash.success"
+        closable
+        type="success"
+        :title="$t('flashMessages.successTitle')"
+        :text="$t($page.props.flash.success)"
+        class="mb-4 mt-3 ms-3 me-3"
+    ></v-alert>
+    <v-alert
+        v-if="$page.props.flash.warning"
+        closable
+        type="warning"
+        :title="$t('flashMessages.warningTitle')"
+        :text="$t($page.props.flash.warning)"
+        class="mb-4"
+    ></v-alert>
+    <v-alert
+        v-if="$page.props.flash.error || Object.keys($page.props.errors).length > 0"
+        closable
+        type="error"
+        :title="$t('flashMessages.errorTitle')"
+        :text="formatErrors($page.props.errors)"
+        class="mb-4"
+    ></v-alert>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            show: true,
-        }
-    },
-    watch: {
-        '$page.props.flash': {
-            handler() {
-                this.show = true
-            },
-            deep: true,
-        },
-    },
+<script setup>
+
+function formatErrors(errorObj) {
+    let ret = '';
+    Object.keys(errorObj).forEach(key => {
+        ret += key + ': ' + errorObj[key] + "\n";
+    });
+    return ret;
 }
+
 </script>

@@ -61,6 +61,8 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('account.index');
     Route::post('/my-account/save', [AccountController::class, 'save'])
         ->name('account.save');
+    Route::post('/my-account/set-locale', [AccountController::class, 'setLocale'])
+        ->name('account.setLocale');
     Route::get('/sign-out', [AccountController::class, 'signOut'])
         ->name('sign-out');
 

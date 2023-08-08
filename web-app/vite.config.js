@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import vuetify from "vite-plugin-vuetify";
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig({
     plugins: [
@@ -10,6 +11,14 @@ export default defineConfig({
                 'resources/js/app.js'
             ],
             refresh: true,
+        }),
+        viteStaticCopy({
+            targets: [
+                {
+                    src: 'node_modules/circle-flags/flags',
+                    dest: 'public/images/circle-flags'
+                }
+            ]
         }),
         vue({
             template: {

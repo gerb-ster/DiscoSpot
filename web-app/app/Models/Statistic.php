@@ -19,6 +19,7 @@ class Statistic extends Model
     const RELEASE_NOT_FOUND = 'release_not_found';
     const RELEASES_IN_FOLDER = 'releases_in_folder';
     const RELEASES_IN_LIST = 'releases_in_list';
+    const RELEASES_IN_WANTLIST = 'releases_in_list';
     const RELEASES_AFTER_FILTER = 'releases_after_filter';
     const TRACKS_ALREADY_IN_PLAYLIST = 'tracks_already_in_playlist';
     const TRACKS_ADDED_TO_PLAYLIST = 'tracks_added_to_playlist';

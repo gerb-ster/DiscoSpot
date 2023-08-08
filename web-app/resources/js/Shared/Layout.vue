@@ -16,6 +16,7 @@
                                 <v-icon>{{ menuIcon }}</v-icon> {{ menuTitle }}
                             </v-toolbar-title>
                             <v-spacer></v-spacer>
+                            <language-select :auth="auth"></language-select>
                             <v-menu location="top end" v-if="!disableMenu">
                                 <template v-slot:activator="{ props }">
                                     <v-btn icon="mdi-account-circle" v-bind="props"></v-btn>
@@ -65,6 +66,7 @@
                                 </v-card>
                             </v-menu>
                         </v-toolbar>
+                        <flash-messages />
                         <v-breadcrumbs v-if="breadCrumbs" :items="breadCrumbs">
                             <template v-slot:prepend>
                                 <v-icon size="small" icon="mdi-link-variant"></v-icon>
@@ -79,6 +81,9 @@
 </template>
 
 <script setup>
+
+import LanguageSelect from "../Components/LanguageSelect.vue";
+import FlashMessages from "./FlashMessages.vue";
 
 const props = defineProps(['menuIcon', 'menuTitle', 'auth', 'disableMenu', 'breadCrumbs']);
 

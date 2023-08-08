@@ -136,6 +136,11 @@ class DiscogsApiClient
      */
     protected function url(string $path) : string
     {
+        // prevent double loading
+        if (str_starts_with($path, $this->baseUrl)) {
+           return $path;
+        }
+
         return "{$this->baseUrl}/{$path}";
     }
 

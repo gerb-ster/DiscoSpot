@@ -6,5 +6,9 @@
     {
         "id": 2,
         "name": "based_on_list"
+    },
+    {
+        "id": 3,
+        "name": "based_on_wantlist"
     }
 ]

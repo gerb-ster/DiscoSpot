@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('discogs_id')->unique();
             $table->string('discogs_username')->unique();
             $table->string('name');
+            $table->string('locale')->default('en');
             $table->string('email')->unique();
             $table->string('avatar')->nullable();
             $table->string('discogs_token', 256);

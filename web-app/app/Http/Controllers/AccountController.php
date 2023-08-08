@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AccountType;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
@@ -50,5 +51,24 @@ class AccountController extends Controller
         Auth::logout();
 
         return redirect(route('landingpage'));
+    }
+
+    /**
+     * Set the new Locale
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function setLocale(Request $request): JsonResponse
+    {
+        $locale = $request->post('locale');
+
+        Auth::user()->update([
+            'locale' =>$locale
+        ]);
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 }

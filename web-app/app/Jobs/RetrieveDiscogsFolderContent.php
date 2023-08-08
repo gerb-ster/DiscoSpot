@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\Models\DiscogsRelease;
 use App\Models\Synchronization;
 use App\Service\DiscogsApiClient;
+use App\Service\DiscogsApiException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -62,56 +64,27 @@ class RetrieveDiscogsFolderContent implements ShouldQueue
             $synchronization->playlist->owner->discogs_secret
         );
 
-        $folderContent = $discogsApi->get($this->resourceUrl, [
-            'per_page' => 100,
-            'page' => $this->page
-        ]);
+        try {
+            $folderContent = $discogsApi->get($this->resourceUrl, [
+                'per_page' => 100,
+                'page' => $this->page
+            ]);
 
-        foreach ($folderContent['releases'] as $entry) {
-            // apply filters..
-            if ($this->passesFilter($synchronization, $entry['basic_information'])) {
-                $discogsRelease = new DiscogsRelease([
-                    'artist' => current($entry['basic_information']['artists'])['name'],
-                    'title' => $entry['basic_information']['title'],
-                    'master_id' => $entry['basic_information']['title'],
-                    'synchronization_uuid' => $this->synchronizationUuid
-                ]);
+            foreach ($folderContent['releases'] as $entry) {
+                // apply filters..
+                if ($this->passesFilter($synchronization, $entry['basic_information'])) {
+                    $discogsRelease = new DiscogsRelease([
+                        'artist' => current($entry['basic_information']['artists'])['name'],
+                        'title' => $entry['basic_information']['title'],
+                        'master_id' => $entry['basic_information']['id'],
+                        'synchronization_uuid' => $this->synchronizationUuid
+                    ]);
 
-                $discogsRelease->save();
+                    $discogsRelease->save();
+                }
             }
+        } catch (DiscogsApiException|GuzzleException $e) {
+            // log error
         }
     }
-
-    /**
-     * @param Synchronization $synchronization
-     * @param array $basicInformation
-     * @return bool
-     */
-    private function passesFilter(Synchronization $synchronization, array $basicInformation): bool
-    {
-        // no filters? please continue
-        if (empty($synchronization->playlist->discogs_query_data['filters'])) {
-            return true;
-        }
-
-        foreach ($synchronization->playlist->discogs_query_data['filters'] as $key => $value) {
-            if(array_key_exists($key, $basicInformation)) {
-                if (is_array($basicInformation[$key])) {
-                    foreach ($basicInformation[$key] as $entry) {
-                        if($entry['name'] === $value) {
-                            return true;
-                        }
-                    }
-                }
-
-                if(is_string($basicInformation[$key])) {
-                    if($basicInformation[$key] === $value) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-     }
 }

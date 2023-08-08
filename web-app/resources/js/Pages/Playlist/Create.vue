@@ -8,16 +8,17 @@
                 color="transparent"
             >
                 <template v-slot:default="{ prev, next }">
-                    <v-stepper-header bg-color="transparent">
-                        <template v-for="n in steps" :key="`${n}-step`">
+                    <v-stepper-header>
+                        <template v-for="(item, index) in steps" :key="`${index}-step`">
                             <v-stepper-item
-                                :complete="e1 > n"
-                                :step="`Step {{ n }}`"
-                                :value="n"
+                                :complete="e1 > index"
+                                :step="index"
+                                :value="index + 1"
+                                :title="$t(item)"
                             ></v-stepper-item>
                             <v-divider
-                                v-if="n !== steps"
-                                :key="n"
+                                v-if="index < (steps.length - 1)"
+                                :key="index"
                             ></v-divider>
                         </template>
                     </v-stepper-header>
@@ -59,6 +60,8 @@ import CreateAddFilters from "../../Components/Playlist/CreateAddFilters.vue";
 import CreateSummary from "../../Components/Playlist/CreateSummary.vue";
 import CreateSelectList from "../../Components/Playlist/CreateSelectList.vue";
 
+const { t } = useI18n();
+
 const form = useForm({
     name: null,
     typeId: null,
@@ -70,13 +73,16 @@ const form = useForm({
 const props = defineProps(['playlistTypes', 'filterTypes', 'auth']);
 
 const e1 = ref(1)
-const steps = ref(4)
+const steps = ref([
+    'playlistCreate.steps.one',
+    'playlistCreate.steps.two',
+    'playlistCreate.steps.three',
+    'playlistCreate.steps.four'
+]);
 
 const disable = computed(() => {
-    return e1.value === 1 ? 'prev' : e1.value === steps.value ? 'next' : undefined
+    return e1.value === 1 ? 'prev' : e1.value === steps.value.length ? 'next' : undefined
 })
-
-//const steps = ref(['Step 1', 'Step 2', 'Step 3', 'Step 4']);
 
 async function submit (event) {
     const results = await event;
@@ -86,7 +92,6 @@ async function submit (event) {
     }
 }
 
-const { t } = useI18n();
 
 const breadCrumbs = ref([{
     title: t('breadCrumbs.myPlaylists'),

@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Models\PlaylistType;
 use App\Models\Statistic;
-use App\Models\Synchronization;
 use App\Service\DiscogsApiClient;
 use Exception;
 use Illuminate\Bus\Batchable;
@@ -49,21 +49,67 @@ class RetrieveDiscogsData implements ShouldQueue
             $synchronization->playlist->owner->discogs_secret
         );
 
-        $folder_id = $synchronization->playlist->discogs_query_data['folder_id'];
-        $folder = "users/{$synchronization->playlist->owner->discogs_username}/collection/folders/{$folder_id}";
+        switch ($synchronization->playlist->playlist_type_id) {
+            case PlaylistType::BASED_ON_FOLDER:
+                $folderId = $synchronization->playlist->discogs_query_data['folder_id'];
+                $folder = "users/{$synchronization->playlist->owner->discogs_username}/collection/folders/{$folderId}";
 
-        $metadata = $discogsApi->get($folder);
+                $metadata = $discogsApi->get($folder);
 
-        // store some statistics
-        $this->storeStatistic(Statistic::RELEASES_IN_FOLDER, $metadata['count']);
+                // store some statistics
+                $this->storeStatistic(Statistic::RELEASES_IN_FOLDER, $metadata['count']);
 
-        // hydrate the batch with jobs
-        for ($x = 1; $x <= ceil($metadata['count'] / 100); $x++) {
-            $this->batch()->add(new RetrieveDiscogsFolderContent(
-                $this->synchronizationUuid,
-                $folder . "/releases",
-                $x
-            ));
+                // hydrate the batch with jobs
+                for ($x = 1; $x <= ceil($metadata['count'] / 100); $x++) {
+                    $this->batch()->add(new RetrieveDiscogsFolderContent(
+                        $this->synchronizationUuid,
+                        $folder . "/releases",
+                        $x
+                    ));
+                }
+                break;
+
+            case PlaylistType::BASED_ON_LIST:
+                $list = $discogsApi->get("lists/{$synchronization->playlist->discogs_query_data['list_id']}");
+
+                $resourceUrls = [];
+
+                // store some statistics
+                $this->storeStatistic(Statistic::RELEASES_IN_LIST, count($list['items']));
+
+                foreach ($list['items'] as $item) {
+                    if ($item['type'] === "master") {
+                        $resourceUrls[] = $item['resource_url'];
+                    }
+                }
+
+                $this->batch()->add(new RetrieveDiscogsListContent(
+                    $this->synchronizationUuid,
+                    $resourceUrls
+                ));
+
+                break;
+
+            case PlaylistType::BASED_ON_WANTLIST:
+                $wantListResource = "users/{$synchronization->playlist->owner->discogs_username}/wants";
+                $metadata = $discogsApi->get($wantListResource);
+
+                // store some statistics
+                $this->storeStatistic(Statistic::RELEASES_IN_WANTLIST, $metadata['pagination']['items']);
+
+                // hydrate the batch with jobs
+                for ($x = 1; $x <= ceil($metadata['pagination']['items'] / 100); $x++) {
+                    $this->batch()->add(new RetrieveDiscogsWantListContent(
+                        $this->synchronizationUuid,
+                        $wantListResource,
+                        $x
+                    ));
+                }
+
+                break;
+
+            default:
+                throw new Exception('Unknown PlaylistTypeID');
         }
     }
 }

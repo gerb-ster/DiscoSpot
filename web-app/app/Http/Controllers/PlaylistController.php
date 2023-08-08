@@ -85,7 +85,7 @@ class PlaylistController extends Controller
         $playlist->discogs_query_data = $discogsQueryData;
         $playlist->save();
 
-        return redirect(route('playlist.index'))->with('success', 'Playlist created.');
+        return redirect(route('playlist.index'))->with('success', 'playlist.messages.created');
     }
 
     /**
@@ -98,7 +98,7 @@ class PlaylistController extends Controller
             'playlist_uuid' => $playlist->uuid
         ]);
 
-        return redirect(route('playlist.index'))->with('success', 'Playlist Synchronization Started.');
+        return redirect(route('playlist.index'))->with('success', 'playlist.messages.sync_started');
     }
 
     /**
@@ -113,6 +113,6 @@ class PlaylistController extends Controller
         $playlist->synchronizations()->delete();
         $playlist->delete();
 
-        return redirect(route('playlist.index'))->with('success', 'adminResearchProjects.messages.deleted');
+        return redirect(route('playlist.index'))->with('success', 'playlist.messages.deleted');
     }
 }
