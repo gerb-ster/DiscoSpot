@@ -69,8 +69,6 @@ class RetrieveDiscogsWantListContent implements ShouldQueue
                 'page' => $this->page
             ]);
 
-            ray($folderContent);
-
             foreach ($folderContent['wants'] as $entry) {
                 // apply filters..
                 if ($this->passesFilter($synchronization, $entry['basic_information'])) {
@@ -86,6 +84,7 @@ class RetrieveDiscogsWantListContent implements ShouldQueue
             }
         } catch (DiscogsApiException|GuzzleException $e) {
             // log error
+            $synchronization->addThrowableToFeedback($e);
         }
     }
 }

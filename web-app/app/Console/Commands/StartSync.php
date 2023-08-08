@@ -78,21 +78,20 @@ class StartSync extends Command
                     Bus::chain([
                         new RemoveTracksFromPlaylist($synchronization->uuid),
                         new CleanUpSynchronization($synchronization->uuid)
-                    ])->catch(function (Throwable $e) {
-                        ray($e->getMessage());
+                    ])->catch(function (Throwable $e) use ($synchronization) {
+                        $synchronization->finish(false, $e);
                     })->dispatch();
-                })->catch(function (Batch $batch, Throwable $e) {
-                    ray($e->getMessage());
+                })->catch(function (Batch $batch, Throwable $e) use ($synchronization) {
+                    $synchronization->finish(false, $e);
                 })->dispatch();
-            })->catch(function (Batch $batch, Throwable $e) {
-                ray($e->getMessage());
+            })->catch(function (Batch $batch, Throwable $e) use ($synchronization) {
+                $synchronization->finish(false, $e);
             })->dispatch();
-        })->catch(function (Batch $batch, Throwable $e) {
-            ray($e->getMessage());
-        })->finally(function (Batch $batch) use ($playlist) {
+        })->catch(function (Batch $batch, Throwable $e) use ($synchronization) {
+            $synchronization->finish(false, $e);
+        })->finally(function (Batch $batch) use ($synchronization) {
             // The batch has finished executing...
-            $playlist->is_synchronizing = false;
-            $playlist->save();
+            $synchronization->finish(true);
         })->dispatch();
 
         return 0;

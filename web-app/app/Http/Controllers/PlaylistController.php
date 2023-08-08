@@ -22,7 +22,10 @@ class PlaylistController extends Controller
     public function index(): Response
     {
         return inertia('Playlist/Index', [
-            'playlists' => Playlist::where('owner_id', Auth::user()->id)->with('playlistType')->get()
+            'playlists' => Playlist::where('owner_id', Auth::user()->id)->with('playlistType')->get(),
+            'can' => [
+                'create_playlist' => Auth::user()->can('create', Playlist::class),
+            ],
         ]);
     }
 
@@ -33,7 +36,10 @@ class PlaylistController extends Controller
     public function show(Playlist $playlist): Response
     {
         return inertia('Playlist/Show', [
-            'playlist' => $playlist->load('playlistType')
+            'playlist' => $playlist->load('playlistType'),
+            'can' => [
+                'sync' => Auth::user()->can('sync', $playlist),
+            ],
         ]);
     }
 

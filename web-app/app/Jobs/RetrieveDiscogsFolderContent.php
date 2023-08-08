@@ -85,6 +85,7 @@ class RetrieveDiscogsFolderContent implements ShouldQueue
             }
         } catch (DiscogsApiException|GuzzleException $e) {
             // log error
+            $synchronization->addThrowableToFeedback($e);
         }
     }
 }

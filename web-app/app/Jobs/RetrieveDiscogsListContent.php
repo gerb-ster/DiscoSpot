@@ -76,7 +76,7 @@ class RetrieveDiscogsListContent implements ShouldQueue
                     $discogsRelease->save();
                 }
             } catch (DiscogsApiException|GuzzleException $e) {
-                ray($e);
+                $synchronization->addThrowableToFeedback($e);
             }
         }
     }

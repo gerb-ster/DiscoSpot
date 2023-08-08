@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\PlaylistType;
 use App\Models\Statistic;
+use App\Models\SynchronizationStatus;
 use App\Service\DiscogsApiClient;
 use Exception;
 use Illuminate\Bus\Batchable;
@@ -43,6 +44,11 @@ class RetrieveDiscogsData implements ShouldQueue
     public function handle(): void
     {
         $synchronization = $this->getSynchronization();
+
+        // first of all, let set the status to running
+        $synchronization->update([
+            'status_id' => SynchronizationStatus::RUNNING
+        ]);
 
         $discogsApi = new DiscogsApiClient(
             $synchronization->playlist->owner->discogs_token,

@@ -21,6 +21,7 @@
                 </v-col>
             </v-row>
             <v-btn
+                v-if="can.create_playlist"
                 class="mt-10"
                 prepend-icon="mdi-plus"
                 color="green-darken-1"
@@ -30,6 +31,13 @@
             >
                 {{ $t('playlistIndex.createPlaylistBtn') }}
             </v-btn>
+            <v-alert
+                v-else
+                class="mt-5"
+                type="warning"
+                :title="$t('playlistIndex.maxPlaylistsTitle')"
+                :text="$t('playlistIndex.maxPlaylistsText')"
+            ></v-alert>
         </div>
     </Layout>
 </template>
@@ -39,6 +47,6 @@
 import { Head } from '@inertiajs/vue3'
 import Layout from "../../Shared/Layout.vue";
 
-const props = defineProps(['playlists', 'auth']);
+const props = defineProps(['playlists', 'auth', 'can']);
 
 </script>

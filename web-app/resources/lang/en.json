@@ -53,7 +53,9 @@
         "pageTitle": "My Playlists",
         "title": "My Playlists",
         "introText": "This is a list of all your playlist you've created with DiscoSpot!",
-        "createPlaylistBtn": "Create New Playlist"
+        "createPlaylistBtn": "Create New Playlist",
+        "maxPlaylistsTitle": "Maximum playlists reached",
+        "maxPlaylistsText": "You have reached your maximum amount of playlists, if you wish to add more, please upgrade your account"
     },
     "playlistShow": {
         "pageTitle": "Playlist details",
