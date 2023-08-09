@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('playlist_id')->constrained('playlists');
             $table->foreignId('status_id')->constrained('synchronization_status');
             $table->json('statistics');
-            $table->json('feedback');
+            $table->json('feedback')->default("[]");
             $table->timestamps();
         });
     }

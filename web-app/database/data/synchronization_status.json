@@ -1,26 +1,18 @@
 [
     {
         "id": 1,
-        "name": "READY_FOR_START"
+        "name": "CREATED"
     },
     {
         "id": 2,
-        "name": "RETRIEVING_DISCOGS_DATA"
+        "name": "RUNNING"
     },
     {
         "id": 3,
-        "name": "RETRIEVING_SPOTIFY_DATA"
+        "name": "FINISHED_WITH_SUCCESS"
     },
     {
         "id": 4,
-        "name": "UPDATING_SPOTIFY_PLAYLIST"
-    },
-    {
-        "id": 5,
-        "name": "CLEANING_UP"
-    },
-    {
-        "id": 6,
-        "name": "DONE"
+        "name": "FINISHED_WITH_FAILURE"
     }
 ]

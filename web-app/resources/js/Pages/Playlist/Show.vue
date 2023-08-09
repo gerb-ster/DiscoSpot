@@ -5,20 +5,20 @@
         <v-row>
             <v-col class="mt-3 ms-3" cols="12">
                 <h2 class="text-h4 font-weight-black mb-4">{{ playlist.name }}</h2>
-                <p class="text-body-2 mb-4" v-if="playlist.spotify_identifier">
+                <p class="text-body-2 mb-4" v-if="playlist.spotifyIdentifier">
                     <v-btn
                         prepend-icon="mdi-spotify"
                         variant="flat"
-                        :href="'https://open.spotify.com/playlist/'+playlist.spotify_identifier"
+                        :href="'https://open.spotify.com/playlist/'+playlist.spotifyIdentifier"
                         color="light-green-lighten-1"
                         target="_blank"
                     >{{ $t('playlistShow.openPlaylistSpotify') }}</v-btn>
                 </p>
                 <p class="text-body-1 mb-2">
-                    {{ t('playlistTypes.'+playlist.playlist_type.name) }}
+                    {{ t('playlistTypes.'+playlist.playlistTypeName) }}
                 </p>
                 <p class="text-caption mb-4">
-                    {{ $t('playlistShow.lastSynced') }} @ {{ playlist.last_sync }}
+                    {{ $t('playlistShow.lastSynced') }} @ {{ playlist.lastSyncTimestamp }}
                 </p>
             </v-col>
             <v-col class="mt-3 mb-5 ms-3" cols="12">
@@ -36,8 +36,8 @@
                     color="deep-orange-darken-1"
                     variant="flat"
                     :href="$route('playlist.sync', playlist.uuid)"
-                    :disabled="playlist.is_synchronizing"
-                    :loading="playlist.is_synchronizing"
+                    :disabled="playlist.isSynchronizing"
+                    :loading="playlist.isSynchronizing"
                     class="active"
                 >
                     {{ $t('playlistShow.syncPlaylistBtn') }}
@@ -72,6 +72,8 @@ import Confirm from "../../Components/Confirm.vue";
 
 const props = defineProps(['playlist', 'auth']);
 const confirmDelete = ref(null);
+
+console.log(props.playlist);
 
 const { t } = useI18n();
 

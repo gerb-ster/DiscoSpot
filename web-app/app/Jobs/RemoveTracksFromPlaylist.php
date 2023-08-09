@@ -68,7 +68,7 @@ class RemoveTracksFromPlaylist implements ShouldQueue
         }
 
         // store some statistics
-        $this->storeStatistic(Statistic::TRACKS_REMOVED_FROM_PLAYLIST, count($tracks));
+        $this->storeStatistic(Statistic::TRACKS_REMOVED_FROM_PLAYLIST, $tracks['tracks']);
 
         // remove any tracks
         $api->deletePlaylistTracks($synchronization->playlist->spotify_identifier, $tracks);

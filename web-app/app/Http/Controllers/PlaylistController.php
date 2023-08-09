@@ -36,7 +36,18 @@ class PlaylistController extends Controller
     public function show(Playlist $playlist): Response
     {
         return inertia('Playlist/Show', [
-            'playlist' => $playlist->load('playlistType'),
+            'playlist' => [
+                'uuid' => $playlist->uuid,
+                'name' => $playlist->name,
+                'spotifyIdentifier' => $playlist->spotify_identifier,
+                'playlistTypeName' => $playlist->playlistType->name,
+                'isSynchronizing' => $playlist->is_synchronizing,
+                'lastSyncTimestamp' => $playlist->last_sync,
+                'lastSyncObj' => [
+                    'statusName' => $playlist->synchronizations->last()->status->name,
+                    'statistics' => $playlist->synchronizations->last()->statistics
+                ]
+            ],
             'can' => [
                 'sync' => Auth::user()->can('sync', $playlist),
             ],
